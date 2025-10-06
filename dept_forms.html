@@ -410,7 +410,9 @@ Newsletter Editor
 </div>
 </div>
 <div class="form-group mt-6">
-<label class="block text-sm font-medium mb-2 text-neutral-300">Team Building Activities:</label>
+<label class="block text-sm font-medium mb-2 text-neutral-300">Activities Title:</label>
+<input type="text" id="activities-title" placeholder="Team Building Activities" class="w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white mb-3" value="Team Building Activities">
+<label class="block text-sm font-medium mb-2 text-neutral-300">Team Activities Content:</label>
 <div id="activities-editor" class="bg-neutral-700 rounded-lg mb-3"></div>
 <label class="block text-sm font-medium mb-2 text-neutral-300 mt-4">Activity Images:</label>
 <div class="space-y-3">
@@ -2261,6 +2263,7 @@ async function generateHTML() {
   
   // Activities data
   const activities = convertWhiteTextToBlack(editors['activities-editor'].root.innerHTML);
+  const activitiesTitle = document.getElementById('activities-title')?.value || 'Team Building Activities';
   
   const mainContent = editors['main-editor'] ? convertWhiteTextToBlack(editors['main-editor'].root.innerHTML) : '';
   const notes = editors['notes-editor'] ? convertWhiteTextToBlack(editors['notes-editor'].root.innerHTML) : '';
@@ -2345,49 +2348,41 @@ async function generateHTML() {
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd;">
               ${businessTopics.map(topic => `
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-left: 20px;">
-                      <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${topic.title}</h4>
-                    </td>
-                  </tr>
-                </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${topic.content}${topic.link ? ` <a href="${topic.link}">here</a>` : ''}</li>
-                </ul>
+                <div style="margin-bottom: 15px;">
+                  <h4 style="color: #FEA702; font-size: 16px; margin: 0 0 8px 20px;">${topic.title}</h4>
+                  <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                    <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${topic.content}${topic.link ? ` <a href="${topic.link}">here</a>` : ''}</li>
+                  </ul>
+                </div>
               `).join('')}
               ${activities ? `
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding-left: 20px;">
-                      <h4 style="color: #FEA702; font-size: 16px; margin: 0;">🎉 Team Building Activities</h4>
-                    </td>
-                  </tr>
-                </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
-                </ul>
-                ${sectionImages.activities && sectionImages.activities.length > 0 ? `
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    ${sectionImages.activities.slice(0, 3).map(img => `
-                    <td valign="top" style="padding: 10px;">
-                      <!--[if mso]>
-                      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:300px;height:225px;">
-                      <v:fill type="frame" src="${img}" />
-                      <v:textbox inset="0,0,0,0">
-                      </v:textbox>
-                      </v:rect>
-                      <![endif]-->
-                      <!--[if !mso]><!-- -->
-                      <img src="${img}" alt="Activity" width="300px" height="225px"
-                        style="display: block; margin: 0 auto 10px;" />
-                      <!--<![endif]-->
-                    </td>
-                    `).join('')}
-                  </tr>
-                </table>
-                ` : ''}
+                <div style="margin-bottom: 15px;">
+                  <h4 style="color: #FEA702; font-size: 16px; margin: 0 0 8px 20px;">🎉 ${activitiesTitle}</h4>
+                  <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                    <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
+                  </ul>
+                  ${sectionImages.activities && sectionImages.activities.length > 0 ? `
+                  <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top: 10px;">
+                    <tr>
+                      ${sectionImages.activities.slice(0, 3).map(img => `
+                      <td valign="top" style="padding: 10px; width: 33.33%;">
+                        <!--[if mso]>
+                        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:300px;height:225px;">
+                        <v:fill type="frame" src="${img}" />
+                        <v:textbox inset="0,0,0,0">
+                        </v:textbox>
+                        </v:rect>
+                        <![endif]-->
+                        <!--[if !mso]><!-- -->
+                        <img src="${img}" alt="Activity" width="300" height="225"
+                          style="display: block; margin: 0 auto 10px; max-width: 100%;" />
+                        <!--<![endif]-->
+                      </td>
+                      `).join('')}
+                    </tr>
+                  </table>
+                  ` : ''}
+                </div>
               ` : ''}
             </td>
           </tr>
@@ -2398,27 +2393,22 @@ async function generateHTML() {
             <td style="padding: 15px; font-size: 14px;">
               <h2 style="margin: 0 0 20px; color: #0039A7; font-size: 20px; text-align: center;">🏆 Awards & Performer of the Month</h2>
               ${awardWinners.map(award => `
-                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                  <tr>
-                    <td style="padding: 15px; text-align: center;">
-                      ${award.photo ? `
-                        <!--[if mso]>
-                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:120px;height:120px;">
-                          <v:fill type="frame" src="${award.photo}" />
-                        </v:roundrect>
-                        <![endif]-->
-                        <!--[if !mso]><!-- -->
-                        <img src="${award.photo}" alt="${award.name}" width="120" height="120" style="border-radius: 50%; display: block; margin: 0 auto 10px;" />
-                        <!--<![endif]-->
-                      ` : ''}
-                      <h4 style="margin: 10px 0 5px;">${award.name}</h4>
-                      <p style="margin: 0;"><em>${award.role}</em></p>
-                      <p style="margin: 0; font-size: 16px; color: #0039A7;"><strong>🏅 ${award.type}</strong></p>
-                      <p style="font-size: 16px; text-align: justify; padding-top: 10px;">${award.description}</p>
-                    </td>
-                  </tr>
-                </table>
-                <br>
+                <div style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; text-align: center;">
+                  ${award.photo ? `
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:120px;height:120px;">
+                      <v:fill type="frame" src="${award.photo}" />
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-- -->
+                    <img src="${award.photo}" alt="${award.name}" width="120" height="120" style="border-radius: 50%; display: block; margin: 0 auto 10px;" />
+                    <!--<![endif]-->
+                  ` : ''}
+                  <h4 style="margin: 10px 0 5px;">${award.name}</h4>
+                  <p style="margin: 0;"><em>${award.role}</em></p>
+                  <p style="margin: 0; font-size: 16px; color: #0039A7;"><strong>🏅 ${award.type}</strong></p>
+                  <p style="font-size: 16px; text-align: justify; padding-top: 10px;">${award.description}</p>
+                </div>
               `).join('')}
             </td>
           </tr>
@@ -2427,69 +2417,59 @@ async function generateHTML() {
           ${spotlightPeople.length > 0 ? `
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
+              <div style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
                 <h2 style="text-align: center;">Monthly Spotlight</h2>
                 ${spotlightPeople.map(person => `
-                  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                    <tr>
-                      <td align="center" style="width: 450px; height: 300px; padding-bottom: 20px;">
-                        ${person.photo ? `
-                          <!--[if mso]>
-                          <img src="${person.photo}" width="290px" height="240px"
-                               style="display: block; border: 0;" border="0" alt="${person.name}">
-                          <![endif]-->
-                          <!--[if !mso]><!-- -->
-                          <img src="${person.photo}" alt="${person.name}" style="align-items: center; width: 290px; height: 240px; border-radius: 8px;" />
-                          <!--<![endif]-->
-                        ` : ''}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="vertical-align: top;">
-                        <h3>Meet ${person.name}</h3>
-                        <p><strong style="color: #0039A7; font-size: 16px;">Role:</strong> ${person.role}</p>
-                        <p><strong style="color: #0039A7; font-size: 16px;">Tenure:</strong> ${person.tenure}</p>
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Key Projects</h4>
-                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.project}</li>
-                        </ul>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colspan="2">
-                        <h4 style="margin: 0 0 8px; color: #0039A7; font-size: 16px;">Tech Stack</h4>
-                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.tech}</li>
-                        </ul>
-                        ${person.growth ? `
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Growth Story</h4>
-                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.growth}</li>
-                        </ul>
-                        ` : ''}
-                        ${person.facts ? `
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Fun Facts</h4>
-                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.facts}</li>
-                        </ul>
-                        ` : ''}
-                        ${person.quote ? `
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Quote</h4>
-                        <p style="margin: 0 0 12px; font-size: 16px; color: #666; line-height: 1.4; font-style: italic; padding: 20px; background-color: #f5f7fc; border-left: 4px solid #0039A7;">
-                          "${person.quote}"
-                        </p>
-                        ` : ''}
-                        ${person.reason ? `
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Spotlight Reason</h4>
-                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.reason}</li>
-                        </ul>
-                        ` : ''}
-                      </td>
-                    </tr>
-                  </table>
+                  <div style="margin-bottom: 30px; border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+                    ${person.photo ? `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                      <!--[if mso]>
+                      <img src="${person.photo}" width="290" height="240"
+                           style="display: block; border: 0; margin: 0 auto;" border="0" alt="${person.name}">
+                      <![endif]-->
+                      <!--[if !mso]><!-- -->
+                      <img src="${person.photo}" alt="${person.name}" style="width: 290px; height: 240px; border-radius: 8px; display: block; margin: 0 auto;" />
+                      <!--<![endif]-->
+                    </div>
+                    ` : ''}
+                    <h3>Meet ${person.name}</h3>
+                    <p><strong style="color: #0039A7; font-size: 16px;">Role:</strong> ${person.role}</p>
+                    <p><strong style="color: #0039A7; font-size: 16px;">Tenure:</strong> ${person.tenure}</p>
+                    <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Key Projects</h4>
+                    <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                      <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.project}</li>
+                    </ul>
+                    <h4 style="margin: 0 0 8px; color: #0039A7; font-size: 16px;">Tech Stack</h4>
+                    <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                      <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.tech}</li>
+                    </ul>
+                    ${person.growth ? `
+                    <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Growth Story</h4>
+                    <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                      <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.growth}</li>
+                    </ul>
+                    ` : ''}
+                    ${person.facts ? `
+                    <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Fun Facts</h4>
+                    <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                      <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.facts}</li>
+                    </ul>
+                    ` : ''}
+                    ${person.quote ? `
+                    <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Quote</h4>
+                    <p style="margin: 0 0 12px; font-size: 16px; color: #666; line-height: 1.4; font-style: italic; padding: 20px; background-color: #f5f7fc; border-left: 4px solid #0039A7;">
+                      "${person.quote.replace(/<[^>]*>/g, '')}"
+                    </p>
+                    ` : ''}
+                    ${person.reason ? `
+                    <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Spotlight Reason</h4>
+                    <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                      <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.reason}</li>
+                    </ul>
+                    ` : ''}
+                  </div>
                 `).join('')}
-              </section>
+              </div>
             </td>
           </tr>
           ` : ''}
@@ -2503,54 +2483,50 @@ async function generateHTML() {
               <h2 style="text-align: center; color: #0039A7;">🎉 New Joiners & Birthdays – ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
               ${joiners.length > 0 ? `
               <h3 style="color: #0039A7;">👋 Welcome to the Team!</h3>
-              <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse;">
-                <tr>
-                  ${joiners.map(j => `
-                  <td valign="top" style="text-align: center; width: 33%;">
-                    ${j.image ? `
-                      <!--[if mso]>
-                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
-                        <v:fill type="frame" src="${j.image}" />
-                      </v:roundrect>
-                      <![endif]-->
-                      <!--[if !mso]><!-- -->
-                      <img src="${j.image}" alt="${j.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" />
-                      <!--<![endif]-->
-                    ` : ''}
-                    <p style="margin: 10px 0 0;">
-                      <strong style="font-size: 14px;">${j.name}</strong><br>
-                      <em style="font-size: 13px;">${j.role}</em>
-                    </p>
-                  </td>
-                  `).join('')}
-                </tr>
-              </table>
+              <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 20px 0;">
+                ${joiners.map(j => `
+                <div style="text-align: center; width: 150px; margin: 10px;">
+                  ${j.image ? `
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
+                      <v:fill type="frame" src="${j.image}" />
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-- -->
+                    <img src="${j.image}" alt="${j.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px;" />
+                    <!--<![endif]-->
+                  ` : ''}
+                  <p style="margin: 10px 0 0;">
+                    <strong style="font-size: 14px;">${j.name}</strong><br>
+                    <em style="font-size: 13px;">${j.role}</em>
+                  </p>
+                </div>
+                `).join('')}
+              </div>
               ` : ''}
               ${birthdays.length > 0 ? `
               <h3 style="color: #0039A7; margin-top: 40px;">🎂 Happy Birthday To:</h3>
-              <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse;">
-                <tr>
-                  ${birthdays.slice(0, 3).map(b => `
-                  <td valign="top" style="width: 33%; text-align: center; padding: 10px;">
-                    ${b.image ? `
-                      <!--[if mso]>
-                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
-                        <v:fill type="frame" src="${b.image}" />
-                      </v:roundrect>
-                      <![endif]-->
-                      <!--[if !mso]><!-- -->
-                      <img src="${b.image}" alt="${b.name}" width="80" height="80" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px;" />
-                      <!--<![endif]-->
-                    ` : ''}
-                    <p style="margin: 0; font-size: 14px;">
-                      <strong>${b.name}</strong><br>
-                      ${b.date ? new Date(b.date).toLocaleDateString() : ''}<br>
-                      <em style="font-size: 13px;">${b.wishes && b.wishes.trim() && b.wishes !== '<p><br></p>' ? b.wishes.replace(/<[^>]*>/g, '') : 'Wishing you an amazing year ahead! 🎉'}</em>
-                    </p>
-                  </td>
-                  `).join('')}
-                </tr>
-              </table>
+              <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 20px 0;">
+                ${birthdays.slice(0, 3).map(b => `
+                <div style="text-align: center; width: 150px; margin: 10px;">
+                  ${b.image ? `
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
+                      <v:fill type="frame" src="${b.image}" />
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-- -->
+                    <img src="${b.image}" alt="${b.name}" width="80" height="80" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px;" />
+                    <!--<![endif]-->
+                  ` : ''}
+                  <p style="margin: 0; font-size: 14px;">
+                    <strong>${b.name}</strong><br>
+                    ${b.date ? new Date(b.date).toLocaleDateString() : ''}<br>
+                    <em style="font-size: 13px;">${b.wishes && b.wishes.trim() && b.wishes !== '<p><br></p>' ? b.wishes.replace(/<[^>]*>/g, '') : 'Wishing you an amazing year ahead! 🎉'}</em>
+                  </p>
+                </div>
+                `).join('')}
+              </div>
               ` : ''}
             </td>
           </tr>
@@ -2560,9 +2536,9 @@ async function generateHTML() {
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
               <h2 style="color: #0039A7;">📅 Upcoming Events</h2>
-              <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${events}</li>
-              </ul>
+              <div style="font-size: 16px; line-height: 1.6; margin-left: 20px;">
+                ${events}
+              </div>
             </td>
           </tr>
           ` : ''}
@@ -2571,7 +2547,9 @@ async function generateHTML() {
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
               <h2 style="color: #0039A7;">📝 Notes</h2>
-              <div>${notes}</div>
+              <div style="font-size: 16px; line-height: 1.6;">
+                ${notes}
+              </div>
             </td>
           </tr>
           ` : ''}
@@ -2753,6 +2731,7 @@ function showSaveIndicator(text, isError = false) {
 function collectFormData() {
   const data = {
     title: document.querySelector('input[name="newsletter_title"]')?.value || '',
+    activitiesTitle: document.getElementById('activities-title')?.value || 'Team Building Activities',
     logo: {
       src: document.getElementById('current-logo')?.src || '',
       alt: document.getElementById('logo-alt')?.value || '',
@@ -3366,6 +3345,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.addEventListener('input', function(e) {
         if (e.target.matches('input, textarea, select')) {
           updateLastUserAction();
+          
+          // Track activities title changes
+          if (e.target.id === 'activities-title') {
+            trackChange('Business', 'in-progress');
+          }
         }
       });
     }, 1000);
@@ -3395,6 +3379,12 @@ function loadFormData(data) {
   const titleInput = document.querySelector('input[name="newsletter_title"]');
   if (titleInput && data.title) {
     titleInput.value = data.title;
+  }
+  
+  // Load activities title
+  const activitiesTitleInput = document.getElementById('activities-title');
+  if (activitiesTitleInput && data.activitiesTitle) {
+    activitiesTitleInput.value = data.activitiesTitle;
   }
   
   // Load logo
