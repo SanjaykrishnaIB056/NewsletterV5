@@ -2132,13 +2132,17 @@ function generateTemplateSectionsHTML(sections, level = 0) {
           </tr>`;
       } else {
         sectionContent += `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="padding-left: ${level * 20}px;">
-                <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
-              </td>
-            </tr>
-          </table>`;
+          <tr>
+            <td style="padding: 15px; word-wrap: break-word; overflow-wrap: break-word;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-left: ${level * 20}px;">
+                    <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`;
       }
       hasContent = true;
     } else if (hasValidContent) {
@@ -2157,16 +2161,20 @@ function generateTemplateSectionsHTML(sections, level = 0) {
           </tr>`;
       } else {
         sectionContent += `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="padding-left: ${level * 20}px;">
-                <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
-              </td>
-            </tr>
-          </table>
-          <div style="margin-left: ${(level + 1) * 20}px; font-size: 16px; line-height: 1.6; text-align: left;">
-            ${content}
-          </div>`;
+          <tr>
+            <td style="padding: 15px; border-bottom: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-left: ${level * 20}px;">
+                    <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-left: ${(level + 1) * 20}px; font-size: 16px; line-height: 1.6; text-align: left;">
+                ${content}
+              </div>
+            </td>
+          </tr>`;
       }
       hasContent = true;
     }
@@ -2304,12 +2312,26 @@ async function generateHTML() {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>${title || 'Newsletter'}</title>
+  <style>
+    table { table-layout: fixed; }
+    td { word-wrap: break-word; overflow-wrap: break-word; }
+    @media only screen and (max-width: 600px) {
+      .main-table { width: 100% !important; max-width: 100% !important; table-layout: fixed !important; }
+      .wrapper-cell { padding: 10px !important; }
+      .responsive-img { width: 100% !important; height: auto !important; }
+      .activity-img { width: 100% !important; height: auto !important; max-width: 200px !important; }
+      td { padding: 10px !important; word-wrap: break-word !important; }
+    }
+    @media only screen and (min-width: 601px) {
+      .main-table { width: 800px !important; max-width: 800px !important; table-layout: fixed !important; }
+    }
+  </style>
 </head>
 <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color: #f9f9f9;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9f9f9;">
     <tr>
-      <td align="center">
-        <table width="800" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; max-width: 900px; width: 100%;">
+      <td align="center" class="wrapper-cell" style="padding: 20px;">
+        <table width="800" cellpadding="0" cellspacing="0" border="0" class="main-table" style="background-color: #ffffff; max-width: 800px; width: 800px; margin: 0 auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); table-layout: fixed;">
           <tr>
             <td align="center" style="padding: 20px 0;">
               <img 
@@ -2325,9 +2347,9 @@ async function generateHTML() {
           </tr>
           ${intro ? `
           <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd;">
+            <td style="padding: 15px; border-bottom: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word;">
               <h2 style="color: #0039A7; margin: 0 0 10px; font-size: 20px;">👋 Hello Team,</h2>
-              <p style="margin: 0 0 10px; font-size: 16px; text-align: justify">${intro}</p>
+              <p style="margin: 0 0 10px; font-size: 16px; text-align: justify; word-wrap: break-word;">${intro}</p>
             </td>
           </tr>
           ` : ''}
@@ -2343,7 +2365,7 @@ async function generateHTML() {
             </td>
           </tr>
           <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd;">
+            <td style="padding: 15px; border-bottom: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word;">
               ${businessTopics.map(topic => `
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
@@ -2380,8 +2402,8 @@ async function generateHTML() {
                       </v:rect>
                       <![endif]-->
                       <!--[if !mso]><!-- -->
-                      <img src="${img}" alt="Activity" width="300px" height="225px"
-                        style="display: block; margin: 0 auto 10px;" />
+                      <img src="${img}" alt="Activity" width="300" height="225" class="activity-img"
+                        style="display: block; margin: 0 auto 10px; max-width: 100%; height: auto;" />
                       <!--<![endif]-->
                     </td>
                     `).join('')}
@@ -2439,7 +2461,7 @@ async function generateHTML() {
                                style="display: block; border: 0;" border="0" alt="${person.name}">
                           <![endif]-->
                           <!--[if !mso]><!-- -->
-                          <img src="${person.photo}" alt="${person.name}" style="align-items: center; width: 290px; height: 240px; border-radius: 8px;" />
+                          <img src="${person.photo}" alt="${person.name}" class="responsive-img" style="align-items: center; width: 290px; height: 240px; border-radius: 8px; max-width: 100%;" />
                           <!--<![endif]-->
                         ` : ''}
                       </td>
