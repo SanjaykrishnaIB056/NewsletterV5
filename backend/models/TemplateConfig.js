@@ -32,7 +32,7 @@ templateConfigSchema.statics.getDefaultConfig = function() {
         title: 'Engineering Team',
         enabled: true,
         headingOnly: false,
-        color: '#f97316',
+        color: '#1f2937',
         order: 1,
         content: '',
         children: [
@@ -41,7 +41,7 @@ templateConfigSchema.statics.getDefaultConfig = function() {
             title: 'Product Development',
             enabled: true,
             headingOnly: false,
-            color: '#f97316',
+            color: '#3b82f6',
             order: 1,
             content: '',
             children: [
@@ -50,7 +50,7 @@ templateConfigSchema.statics.getDefaultConfig = function() {
                 title: 'Platform',
                 enabled: true,
                 headingOnly: false,
-                color: '#f97316',
+                color: '#3b82f6',
                 order: 1,
                 content: ''
               },
@@ -59,7 +59,7 @@ templateConfigSchema.statics.getDefaultConfig = function() {
                 title: 'Presales',
                 enabled: true,
                 headingOnly: false,
-                color: '#f97316',
+                color: '#3b82f6',
                 order: 2,
                 content: ''
               },
@@ -68,7 +68,7 @@ templateConfigSchema.statics.getDefaultConfig = function() {
                 title: 'Local Works',
                 enabled: true,
                 headingOnly: false,
-                color: '#f97316',
+                color: '#3b82f6',
                 order: 3,
                 content: ''
               },
@@ -77,11 +77,31 @@ templateConfigSchema.statics.getDefaultConfig = function() {
                 title: 'Stores',
                 enabled: true,
                 headingOnly: false,
-                color: '#f97316',
+                color: '#3b82f6',
                 order: 4,
                 content: ''
               }
             ]
+          },
+          {
+            id: 'sre',
+            title: 'SRE',
+            enabled: true,
+            headingOnly: false,
+            color: '#10b981',
+            order: 2,
+            content: '',
+            children: []
+          },
+          {
+            id: 'qa',
+            title: 'QA',
+            enabled: true,
+            headingOnly: false,
+            color: '#f59e0b',
+            order: 3,
+            content: '',
+            children: []
           }
         ]
       }

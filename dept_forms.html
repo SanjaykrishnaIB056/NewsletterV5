@@ -370,18 +370,11 @@ Newsletter Editor
 </form>
 </div>
 
-<!-- Engineering Team Updates -->
-<div class="form-section bg-neutral-800 border border-neutral-700 p-6 rounded-lg">
-<h2 class="text-2xl font-bold mb-6 text-white border-b border-neutral-600 pb-3">Engineering Team Updates</h2>
-<form class="space-y-6">
-<div class="form-group">
-<label class="block text-sm font-medium mb-2 text-neutral-300">Platform Updates:</label>
-<div id="platform-editor" class="bg-neutral-700 rounded-lg"></div>
-</div>
-<div class="form-group">
-<label class="block text-sm font-medium mb-2 text-neutral-300">Pre-Sales Updates:</label>
-<div id="presales-editor" class="bg-neutral-700 rounded-lg"></div>
-</div>
+<!-- Dynamic Template Sections -->
+<div id="template-sections-container" class="form-section bg-neutral-800 border border-neutral-700 p-6 rounded-lg">
+<h2 class="text-2xl font-bold mb-6 text-white border-b border-neutral-600 pb-3">Team Updates</h2>
+<form id="template-sections-form" class="space-y-6">
+<!-- Template sections will be loaded here dynamically -->
 </form>
 </div>
 
@@ -410,7 +403,14 @@ Newsletter Editor
 </div>
 </div>
 <div class="form-group mt-6">
-<label class="block text-sm font-medium mb-2 text-neutral-300">Team Building Activities:</label>
+<div class="flex items-center gap-4 mb-3">
+<label class="block text-sm font-medium text-neutral-300">Team Building Activities:</label>
+<input type="text" id="activities-heading" placeholder="Team Building Activities" class="p-2 border border-neutral-600 rounded bg-neutral-800 text-white" value="Team Building Activities">
+<div class="flex items-center gap-2">
+<label class="text-sm text-neutral-300">Color:</label>
+<input type="color" id="activities-color" value="#0039A7" class="w-8 h-8 border border-neutral-600 rounded cursor-pointer">
+</div>
+</div>
 <div id="activities-editor" class="bg-neutral-700 rounded-lg mb-3"></div>
 <label class="block text-sm font-medium mb-2 text-neutral-300 mt-4">Activity Images:</label>
 <div class="space-y-3">
@@ -538,8 +538,8 @@ Newsletter Editor
 <input type="text" placeholder="Years at company" class="spotlight-tenure w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white focus:bg-neutral-600">
 </div>
 <div class="form-group">
-<label class="block text-sm font-medium mb-2 text-neutral-300">Key Project:</label>
-<input type="text" placeholder="Main project" class="spotlight-project w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white focus:bg-neutral-600">
+<label class="block text-sm font-medium mb-2 text-neutral-300">Key Projects:</label>
+<textarea class="spotlight-project w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white focus:bg-neutral-600" rows="4" placeholder="Describe main projects (one per line)"></textarea>
 </div>
 <div class="form-group">
 <label class="block text-sm font-medium mb-2 text-neutral-300">Tech Stack:</label>
@@ -833,8 +833,6 @@ function initializeEditors() {
   
   const editorConfigs = [
     { id: 'intro-editor', placeholder: 'Enter intro message...' },
-    { id: 'platform-editor', placeholder: 'Enter platform updates...' },
-    { id: 'presales-editor', placeholder: 'Enter pre-sales updates...' },
     { id: 'activities-editor', placeholder: 'Enter team building activities...' },
     { id: 'main-editor', placeholder: 'Enter additional content...' },
     { id: 'notes-editor', placeholder: 'Enter notes...' },
@@ -2079,6 +2077,9 @@ function convertWhiteTextToBlack(html) {
                      .replace(/color:\s*white/gi, 'color: #333333')
                      .replace(/color:\s*rgb\(255,\s*255,\s*255\)/gi, 'color: #333333');
   
+  // Strip HTML tags for plain text
+  cleanHtml = cleanHtml.replace(/<[^>]*>/g, '');
+  
   // Convert Quill indentation classes to inline styles
   for (let i = 1; i <= 8; i++) {
     const indentValue = i * 30;
@@ -2122,12 +2123,12 @@ function generateTemplateSectionsHTML(sections, level = 0) {
     const hasValidContent = content && content.trim() !== '' && content.trim() !== '<p><br></p>';
     
     if (section.headingOnly) {
-      // Heading-only sections using Turbify template structure
+      // Heading-only sections using Turbify template structure with custom colors
       if (level === 0) {
         sectionContent += `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>${section.title}</center></h3>
+              <h3 style="font-size: 18px; color: ${section.color || '#0039A7'}"><center>${section.title}</center></h3>
             </td>
           </tr>`;
       } else {
@@ -2137,7 +2138,7 @@ function generateTemplateSectionsHTML(sections, level = 0) {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="padding-left: ${level * 20}px;">
-                    <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
+                    <h4 style="color: ${section.color || '#FEA702'}; font-size: 16px; margin: 0;">${section.title}</h4>
                   </td>
                 </tr>
               </table>
@@ -2146,12 +2147,12 @@ function generateTemplateSectionsHTML(sections, level = 0) {
       }
       hasContent = true;
     } else if (hasValidContent) {
-      // Regular sections with content using Turbify template structure
+      // Regular sections with content using Turbify template structure with custom colors
       if (level === 0) {
         sectionContent += `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>${section.title}</center></h3>
+              <h3 style="font-size: 18px; color: ${section.color || '#0039A7'}"><center>${section.title}</center></h3>
             </td>
           </tr>
           <tr>
@@ -2166,7 +2167,7 @@ function generateTemplateSectionsHTML(sections, level = 0) {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="padding-left: ${level * 20}px;">
-                    <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${section.title}</h4>
+                    <h4 style="color: ${section.color || '#FEA702'}; font-size: 16px; margin: 0;">${section.title}</h4>
                   </td>
                 </tr>
               </table>
@@ -2207,9 +2208,7 @@ async function generateHTML() {
   const hasCustomLogo = true;
   const intro = editors['intro-editor'] ? convertWhiteTextToBlack(editors['intro-editor'].root.innerHTML) : '';
   
-  // Get platform content with proper formatting
-  const platform = editors['platform-editor'] ? convertWhiteTextToBlack(editors['platform-editor'].root.innerHTML) : '';
-  const presales = editors['presales-editor'] ? convertWhiteTextToBlack(editors['presales-editor'].root.innerHTML) : '';
+  // Platform and presales content will be handled by template sections
   
   // Get template configuration for dynamic sections
   let templateSections = [];
@@ -2269,6 +2268,8 @@ async function generateHTML() {
   
   // Activities data
   const activities = convertWhiteTextToBlack(editors['activities-editor'].root.innerHTML);
+  const activitiesHeading = document.getElementById('activities-heading')?.value || 'Team Building Activities';
+  const activitiesColor = document.getElementById('activities-color')?.value || '#0039A7';
   
   const mainContent = editors['main-editor'] ? convertWhiteTextToBlack(editors['main-editor'].root.innerHTML) : '';
   const notes = editors['notes-editor'] ? convertWhiteTextToBlack(editors['notes-editor'].root.innerHTML) : '';
@@ -2361,7 +2362,7 @@ async function generateHTML() {
           ${businessTopics.length > 0 || activities ? `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>📊 Turbify Business Updates</center></h3>
+              <h3 style="font-size: 18px; color: #0039A7; text-align: left;">📊 Turbify Business Updates</h3>
             </td>
           </tr>
           <tr>
@@ -2382,7 +2383,7 @@ async function generateHTML() {
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td style="padding-left: 20px;">
-                      <h4 style="color: #FEA702; font-size: 16px; margin: 0;">🎉 Team Building Activities</h4>
+                      <h4 id="activities-heading-output" style="color: ${activitiesColor}; font-size: 16px; margin: 0;">🎉 ${activitiesHeading}</h4>
                     </td>
                   </tr>
                 </table>
@@ -2452,20 +2453,12 @@ async function generateHTML() {
               <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
                 <h2 style="text-align: center;">Monthly Spotlight</h2>
                 ${spotlightPeople.map(person => `
+                  ${person.photo ? `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                      <img src="${person.photo}" alt="${person.name}" style="width: 120px; height: auto; border-radius: 8px;" />
+                    </div>
+                  ` : ''}
                   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                    <tr>
-                      <td align="center" style="width: 450px; height: 300px; padding-bottom: 20px;">
-                        ${person.photo ? `
-                          <!--[if mso]>
-                          <img src="${person.photo}" width="290px" height="240px"
-                               style="display: block; border: 0;" border="0" alt="${person.name}">
-                          <![endif]-->
-                          <!--[if !mso]><!-- -->
-                          <img src="${person.photo}" alt="${person.name}" class="responsive-img" style="align-items: center; width: 290px; height: 240px; border-radius: 8px; max-width: 100%;" />
-                          <!--<![endif]-->
-                        ` : ''}
-                      </td>
-                    </tr>
                     <tr>
                       <td style="vertical-align: top;">
                         <h3>Meet ${person.name}</h3>
@@ -2473,7 +2466,7 @@ async function generateHTML() {
                         <p><strong style="color: #0039A7; font-size: 16px;">Tenure:</strong> ${person.tenure}</p>
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Key Projects</h4>
                         <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.project}</li>
+                          ${person.project.split('\n').filter(line => line.trim()).map(line => `<li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${line.trim()}</li>`).join('')}
                         </ul>
                       </td>
                     </tr>
@@ -2498,7 +2491,7 @@ async function generateHTML() {
                         ${person.quote ? `
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Quote</h4>
                         <p style="margin: 0 0 12px; font-size: 16px; color: #666; line-height: 1.4; font-style: italic; padding: 20px; background-color: #f5f7fc; border-left: 4px solid #0039A7;">
-                          "${person.quote}"
+                          "${person.quote.replace(/<[^>]*>/g, '')}"
                         </p>
                         ` : ''}
                         ${person.reason ? `
@@ -2781,6 +2774,8 @@ function collectFormData() {
       width: document.getElementById('logo-width')?.value || '',
       alignment: document.getElementById('logo-alignment')?.value || 'center'
     },
+    activitiesHeading: document.getElementById('activities-heading')?.value || 'Team Building Activities',
+    activitiesColor: document.getElementById('activities-color')?.value || '#0039A7',
     editors: {},
     businessTopics: [],
     awards: [],
@@ -2795,12 +2790,6 @@ function collectFormData() {
   if (editors['intro-editor'] && editors['intro-editor'].root) {
     data.intro = editors['intro-editor'].root.innerHTML;
   }
-  if (editors['platform-editor'] && editors['platform-editor'].root) {
-    data.platform = editors['platform-editor'].root.innerHTML;
-  }
-  if (editors['presales-editor'] && editors['presales-editor'].root) {
-    data.presales = editors['presales-editor'].root.innerHTML;
-  }
   if (editors['activities-editor'] && editors['activities-editor'].root) {
     data.activities = editors['activities-editor'].root.innerHTML;
   }
@@ -2814,9 +2803,9 @@ function collectFormData() {
     data.events = editors['events-editor'].root.innerHTML;
   }
   
-  // Collect other editor content (non-role-based)
+  // Collect other editor content (including dynamic template sections)
   Object.keys(editors).forEach(editorId => {
-    if (editors[editorId] && editors[editorId].root && !['platform-editor', 'presales-editor', 'notes-editor'].includes(editorId)) {
+    if (editors[editorId] && editors[editorId].root && !['intro-editor', 'activities-editor', 'main-editor', 'notes-editor', 'events-editor'].includes(editorId)) {
       data.editors[editorId] = editors[editorId].root.innerHTML;
     }
   });
@@ -3175,31 +3164,15 @@ async function updateFormSections(sections) {
     return;
   }
   
-  // Find the Engineering Team section
-  const engineeringSections = document.querySelectorAll('.form-section');
-  let engineeringSection = null;
-  
-  for (let section of engineeringSections) {
-    const heading = section.querySelector('h2');
-    if (heading && heading.textContent.includes('Engineering')) {
-      engineeringSection = section;
-      break;
-    }
-  }
-  
-  if (!engineeringSection) {
-    console.error('Engineering section not found');
-    return;
-  }
-  
-  const engineeringForm = engineeringSection.querySelector('form');
-  if (!engineeringForm) {
-    console.error('Engineering form not found');
+  // Find the template sections container
+  const templateForm = document.getElementById('template-sections-form');
+  if (!templateForm) {
+    console.error('Template sections form not found');
     return;
   }
   
   // Clear existing sections
-  engineeringForm.innerHTML = '';
+  templateForm.innerHTML = '';
   
   // Add sections from template
   const flatSections = flattenSections(sections);
@@ -3212,8 +3185,9 @@ async function updateFormSections(sections) {
       
       if (section.headingOnly) {
         // Heading-only sections just show a styled heading
+        const rgbaColor = hexToRgba(section.color, 0.1);
         div.innerHTML = `
-          <div class="p-3 rounded-lg" style="background-color: rgba(249, 115, 22, 0.1); border-left: 4px solid ${section.color};">
+          <div class="p-3 rounded-lg" style="background-color: ${rgbaColor}; border-left: 4px solid ${section.color};">
             <h3 class="font-medium" style="color: ${section.color}">${section.title}</h3>
             <p class="text-sm text-neutral-400 mt-1">This section appears as a heading only in the newsletter</p>
           </div>
@@ -3221,7 +3195,7 @@ async function updateFormSections(sections) {
       } else {
         // Regular sections with content editor
         div.innerHTML = `
-          <label class="block text-sm font-medium mb-2" style="color: ${section.color}">${section.title}:</label>
+          <label class="block text-sm font-medium mb-2 text-neutral-300" style="color: ${section.color}">${section.title}:</label>
           <div id="${section.id}-editor" class="bg-neutral-700 rounded-lg"></div>
         `;
         
@@ -3250,7 +3224,7 @@ async function updateFormSections(sections) {
         }, 100);
       }
       
-      engineeringForm.appendChild(div);
+      templateForm.appendChild(div);
     }
   });
 }
@@ -3266,6 +3240,14 @@ function flattenSections(sections, level = 0) {
     }
   });
   return flattened;
+}
+
+// Helper function to convert hex to rgba
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 // Initialize on page load
@@ -3419,6 +3401,16 @@ function loadFormData(data) {
     titleInput.value = data.title;
   }
   
+  // Load activities customization
+  const activitiesHeadingInput = document.getElementById('activities-heading');
+  const activitiesColorInput = document.getElementById('activities-color');
+  if (activitiesHeadingInput && data.activitiesHeading) {
+    activitiesHeadingInput.value = data.activitiesHeading;
+  }
+  if (activitiesColorInput && data.activitiesColor) {
+    activitiesColorInput.value = data.activitiesColor;
+  }
+  
   // Load logo
   if (data.logo) {
     const img = document.getElementById('current-logo');
@@ -3431,12 +3423,6 @@ function loadFormData(data) {
   if (editors['intro-editor'] && data.intro) {
     editors['intro-editor'].clipboard.dangerouslyPasteHTML(data.intro);
   }
-  if (editors['platform-editor'] && data.platform) {
-    editors['platform-editor'].clipboard.dangerouslyPasteHTML(data.platform);
-  }
-  if (editors['presales-editor'] && data.presales) {
-    editors['presales-editor'].clipboard.dangerouslyPasteHTML(data.presales);
-  }
   if (editors['activities-editor'] && data.activities) {
     editors['activities-editor'].clipboard.dangerouslyPasteHTML(data.activities);
   }
@@ -3448,6 +3434,14 @@ function loadFormData(data) {
   }
   if (editors['events-editor'] && data.events) {
     editors['events-editor'].clipboard.dangerouslyPasteHTML(data.events);
+  }
+  
+  // Load legacy platform and presales data into dynamic sections if they exist
+  if (data.platform && editors['platform-editor']) {
+    editors['platform-editor'].clipboard.dangerouslyPasteHTML(data.platform);
+  }
+  if (data.presales && editors['presales-editor']) {
+    editors['presales-editor'].clipboard.dangerouslyPasteHTML(data.presales);
   }
   
   // Load business topics with links
