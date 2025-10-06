@@ -87,6 +87,73 @@
         color: white !important;
         border: 1px solid #4b5563 !important;
         min-height: 120px;
+        text-align: left !important;
+        font-size: 16px !important;
+        line-height: 1.6 !important;
+      }
+      /* Force consistent text formatting */
+      .ql-editor p, .ql-editor div, .ql-editor li, .ql-editor span {
+        text-align: left !important;
+        font-size: 16px !important;
+        line-height: 1.6 !important;
+        margin-bottom: 8px;
+      }
+      .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4 {
+        text-align: left !important;
+        margin-bottom: 8px;
+        margin-top: 12px;
+      }
+      .ql-editor ul, .ql-editor ol {
+        text-align: left !important;
+        padding-left: 20px;
+        font-size: 16px !important;
+        margin-bottom: 8px;
+      }
+      .ql-editor ul li, .ql-editor ol li {
+        font-size: 16px !important;
+        line-height: 1.6 !important;
+        margin-bottom: 4px;
+        text-align: left !important;
+      }
+      /* Nested lists */
+      .ql-editor ul ul, .ql-editor ol ol, .ql-editor ul ol, .ql-editor ol ul {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        padding-left: 20px;
+      }
+      .ql-editor ul li::marker, .ql-editor ol li::marker {
+        font-size: 16px !important;
+      }
+      /* Quill indentation classes */
+      .ql-editor .ql-indent-1 { padding-left: 30px !important; }
+      .ql-editor .ql-indent-2 { padding-left: 60px !important; }
+      .ql-editor .ql-indent-3 { padding-left: 90px !important; }
+      .ql-editor .ql-indent-4 { padding-left: 120px !important; }
+      .ql-editor .ql-indent-5 { padding-left: 150px !important; }
+      .ql-editor .ql-indent-6 { padding-left: 180px !important; }
+      .ql-editor .ql-indent-7 { padding-left: 210px !important; }
+      .ql-editor .ql-indent-8 { padding-left: 240px !important; }
+      /* List indentation - use margin for bullet points to move */
+      .ql-editor li.ql-indent-1 { margin-left: 30px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-2 { margin-left: 60px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-3 { margin-left: 90px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-4 { margin-left: 120px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-5 { margin-left: 150px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-6 { margin-left: 180px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-7 { margin-left: 210px !important; padding-left: 0 !important; }
+      .ql-editor li.ql-indent-8 { margin-left: 240px !important; padding-left: 0 !important; }
+      /* Remove all alignment classes and styles */
+      .ql-editor .ql-align-center,
+      .ql-editor .ql-align-right,
+      .ql-editor .ql-align-justify {
+        text-align: left !important;
+      }
+      /* Override any pasted alignment styles */
+      .ql-editor [style*="text-align"] {
+        text-align: left !important;
+      }
+      .ql-editor [class*="ql-align"] {
+        text-align: left !important;
       }
       .ql-container.ql-snow {
         border: 1px solid #4b5563 !important;
@@ -634,8 +701,72 @@ const editors = {};
 
 function enablePaste(editor) {
   if (!editor?.clipboard) return;
-  editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => delta);
-  editor.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => delta);
+  
+  // Clean up pasted content completely
+  editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+    // Remove all alignment and font size attributes
+    if (node.style) {
+      node.style.textAlign = 'left';
+      node.style.fontSize = '16px';
+      node.style.lineHeight = '1.6';
+    }
+    
+    // Clean up delta operations
+    delta.ops.forEach(op => {
+      if (op.attributes) {
+        delete op.attributes.align;
+        delete op.attributes.size;
+        if (op.attributes.font) {
+          delete op.attributes.font;
+        }
+      }
+    });
+    
+    return delta;
+  });
+  
+  editor.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
+    // Clean text node attributes
+    delta.ops.forEach(op => {
+      if (op.attributes) {
+        delete op.attributes.align;
+        delete op.attributes.size;
+      }
+    });
+    return delta;
+  });
+}
+
+// Function to clean existing editor content
+function cleanEditorContent(editor) {
+  if (!editor) return;
+  
+  // Get current content
+  const delta = editor.getContents();
+  
+  // Clean all operations
+  const cleanedOps = delta.ops.map(op => {
+    if (op.attributes) {
+      const cleanAttributes = { ...op.attributes };
+      delete cleanAttributes.align;
+      delete cleanAttributes.size;
+      delete cleanAttributes.font;
+      
+      // Only keep basic formatting
+      const allowedAttributes = ['bold', 'italic', 'underline', 'color', 'list', 'header', 'link'];
+      Object.keys(cleanAttributes).forEach(key => {
+        if (!allowedAttributes.includes(key)) {
+          delete cleanAttributes[key];
+        }
+      });
+      
+      return { ...op, attributes: Object.keys(cleanAttributes).length > 0 ? cleanAttributes : undefined };
+    }
+    return op;
+  });
+  
+  // Set cleaned content
+  editor.setContents({ ops: cleanedOps });
 }
 
 function initializeEditors() {
@@ -675,6 +806,26 @@ function initializeEditors() {
     clipboard: {
       matchVisual: false,
       matchers: []
+    },
+    keyboard: {
+      bindings: {
+        // Override default alignment shortcuts
+        'align center': {
+          key: 'E',
+          ctrlKey: true,
+          handler: function() { return false; }
+        },
+        'align right': {
+          key: 'R',
+          ctrlKey: true,
+          handler: function() { return false; }
+        },
+        'align justify': {
+          key: 'J',
+          ctrlKey: true,
+          handler: function() { return false; }
+        }
+      }
     }
   };
   
@@ -777,6 +928,11 @@ function initializeEditors() {
         modules: editorModules
       });
       enablePaste(editors[config.id]);
+      
+      // Clean any existing content and force consistent formatting
+      setTimeout(() => {
+        cleanEditorContent(editors[config.id]);
+      }, 50);
       
       // Force toolbar visibility after creation
       setTimeout(() => {
@@ -1914,12 +2070,40 @@ function removeSpotlightPerson(button) {
   item.remove();
 }
 
-// Convert white text to black for email output
+// Convert white text to black and ensure consistent formatting for email output
 function convertWhiteTextToBlack(html) {
   if (!html) return html;
-  return html.replace(/color:\s*#ffffff/gi, 'color: #333333')
-             .replace(/color:\s*white/gi, 'color: #333333')
-             .replace(/color:\s*rgb\(255,\s*255,\s*255\)/gi, 'color: #333333');
+  
+  // Replace white text colors
+  let cleanHtml = html.replace(/color:\s*#ffffff/gi, 'color: #333333')
+                     .replace(/color:\s*white/gi, 'color: #333333')
+                     .replace(/color:\s*rgb\(255,\s*255,\s*255\)/gi, 'color: #333333');
+  
+  // Convert Quill indentation classes to inline styles
+  for (let i = 1; i <= 8; i++) {
+    const indentValue = i * 30;
+    // Handle list items with indentation
+    cleanHtml = cleanHtml.replace(new RegExp(`<li([^>]*class="[^"]*ql-indent-${i}[^"]*")([^>]*)>`, 'gi'), 
+                                  `<li$2 style="margin-left: ${indentValue}px; list-style-position: inside;">`);
+    // Handle paragraphs with indentation
+    cleanHtml = cleanHtml.replace(new RegExp(`<p([^>]*class="[^"]*ql-indent-${i}[^"]*")([^>]*)>`, 'gi'), 
+                                  `<p$2 style="padding-left: ${indentValue}px;">`);
+  }
+  
+  // Remove any remaining class attributes
+  cleanHtml = cleanHtml.replace(/class="[^"]*"/gi, '');
+  
+  // Ensure consistent font size and alignment for all elements  
+  cleanHtml = cleanHtml.replace(/<p([^>]*)>/gi, '<p$1 style="font-size: 16px; line-height: 1.6; text-align: left; margin: 8px 0;">')
+                      .replace(/<li([^>]*)>/gi, '<li$1 style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">')
+                      .replace(/<ul([^>]*)>/gi, '<ul$1 style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">')
+                      .replace(/<ol([^>]*)>/gi, '<ol$1 style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">')
+                      .replace(/<h1([^>]*)>/gi, '<h1$1 style="text-align: left; margin: 12px 0 8px 0;">')
+                      .replace(/<h2([^>]*)>/gi, '<h2$1 style="text-align: left; margin: 12px 0 8px 0;">')
+                      .replace(/<h3([^>]*)>/gi, '<h3$1 style="text-align: left; margin: 12px 0 8px 0;">')
+                      .replace(/<h4([^>]*)>/gi, '<h4$1 style="text-align: left; margin: 12px 0 8px 0;">');
+  
+  return cleanHtml;
 }
 
 // Generate HTML for template sections following Turbify template structure
@@ -1980,9 +2164,9 @@ function generateTemplateSectionsHTML(sections, level = 0) {
               </td>
             </tr>
           </table>
-          <ul style="margin-left: ${(level + 1) * 20}px;">
-            <li>${content}</li>
-          </ul>`;
+          <div style="margin-left: ${(level + 1) * 20}px; font-size: 16px; line-height: 1.6; text-align: left;">
+            ${content}
+          </div>`;
       }
       hasContent = true;
     }
@@ -2014,6 +2198,10 @@ async function generateHTML() {
   const logoAlignment = 'center';
   const hasCustomLogo = true;
   const intro = editors['intro-editor'] ? convertWhiteTextToBlack(editors['intro-editor'].root.innerHTML) : '';
+  
+  // Get platform content with proper formatting
+  const platform = editors['platform-editor'] ? convertWhiteTextToBlack(editors['platform-editor'].root.innerHTML) : '';
+  const presales = editors['presales-editor'] ? convertWhiteTextToBlack(editors['presales-editor'].root.innerHTML) : '';
   
   // Get template configuration for dynamic sections
   let templateSections = [];
@@ -2144,6 +2332,8 @@ async function generateHTML() {
           </tr>
           ` : ''}
 
+
+
           ${templateSections && templateSections.length > 0 ? generateTemplateSectionsHTML(templateSections) : ''}
 
           ${businessTopics.length > 0 || activities ? `
@@ -2162,8 +2352,8 @@ async function generateHTML() {
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px;">
-                  <li>${topic.content}${topic.link ? ` <a href="${topic.link}">here</a>` : ''}</li>
+                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${topic.content}${topic.link ? ` <a href="${topic.link}">here</a>` : ''}</li>
                 </ul>
               `).join('')}
               ${activities ? `
@@ -2174,8 +2364,8 @@ async function generateHTML() {
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px;">
-                  <li>${activities}</li>
+                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
                 </ul>
                 ${sectionImages.activities && sectionImages.activities.length > 0 ? `
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
@@ -2260,27 +2450,27 @@ async function generateHTML() {
                         <p><strong style="color: #0039A7; font-size: 16px;">Role:</strong> ${person.role}</p>
                         <p><strong style="color: #0039A7; font-size: 16px;">Tenure:</strong> ${person.tenure}</p>
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Key Projects</h4>
-                        <ul>
-                          <li>${person.project}</li>
+                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.project}</li>
                         </ul>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="2">
                         <h4 style="margin: 0 0 8px; color: #0039A7; font-size: 16px;">Tech Stack</h4>
-                        <ul>
-                          <li>${person.tech}</li>
+                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.tech}</li>
                         </ul>
                         ${person.growth ? `
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Growth Story</h4>
-                        <ul>
-                          <li>${person.growth}</li>
+                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.growth}</li>
                         </ul>
                         ` : ''}
                         ${person.facts ? `
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Fun Facts</h4>
-                        <ul>
-                          <li>${person.facts}</li>
+                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.facts}</li>
                         </ul>
                         ` : ''}
                         ${person.quote ? `
@@ -2291,8 +2481,8 @@ async function generateHTML() {
                         ` : ''}
                         ${person.reason ? `
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Spotlight Reason</h4>
-                        <ul>
-                          <li>${person.reason}</li>
+                        <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${person.reason}</li>
                         </ul>
                         ` : ''}
                       </td>
@@ -2370,8 +2560,8 @@ async function generateHTML() {
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
               <h2 style="color: #0039A7;">📅 Upcoming Events</h2>
-              <ul>
-                <li>${events}</li>
+              <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${events}</li>
               </ul>
             </td>
           </tr>
