@@ -702,22 +702,62 @@ const editors = {};
 function enablePaste(editor) {
   if (!editor?.clipboard) return;
   
-  // Clean up pasted content completely
+  // Enhanced paste handling to preserve list structure
   editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-    // Remove all alignment and font size attributes
+    // Preserve list structure while cleaning other attributes
+    if (node.tagName === 'UL' || node.tagName === 'OL') {
+      // Keep list structure intact
+      return delta;
+    }
+    
+    if (node.tagName === 'LI') {
+      // Preserve list item structure and indentation
+      const indent = getIndentLevel(node);
+      if (indent > 0) {
+        delta.ops.forEach(op => {
+          if (op.attributes) {
+            op.attributes.indent = indent;
+          } else {
+            op.attributes = { indent };
+          }
+        });
+      }
+      return delta;
+    }
+    
+    // Remove alignment and font size attributes for other elements
     if (node.style) {
       node.style.textAlign = 'left';
       node.style.fontSize = '16px';
       node.style.lineHeight = '1.6';
     }
     
-    // Clean up delta operations
+    // Clean up delta operations while preserving lists
     delta.ops.forEach(op => {
       if (op.attributes) {
         delete op.attributes.align;
         delete op.attributes.size;
         if (op.attributes.font) {
           delete op.attributes.font;
+        }
+        // Keep list and indent attributes
+      }
+    });
+    
+    return delta;
+  });
+  
+  // Special matcher for preserving nested list structure
+  editor.clipboard.addMatcher('LI', (node, delta) => {
+    const indent = getIndentLevel(node);
+    const listType = node.parentElement?.tagName === 'OL' ? 'ordered' : 'bullet';
+    
+    delta.ops.forEach(op => {
+      if (op.insert && typeof op.insert === 'string') {
+        op.attributes = op.attributes || {};
+        op.attributes.list = listType;
+        if (indent > 0) {
+          op.attributes.indent = indent;
         }
       }
     });
@@ -726,25 +766,44 @@ function enablePaste(editor) {
   });
   
   editor.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
-    // Clean text node attributes
+    // Clean text node attributes but preserve list context
     delta.ops.forEach(op => {
       if (op.attributes) {
         delete op.attributes.align;
         delete op.attributes.size;
+        // Keep list attributes
       }
     });
     return delta;
   });
 }
 
-// Function to clean existing editor content
+// Helper function to determine indentation level
+function getIndentLevel(node) {
+  let level = 0;
+  let parent = node.parentElement;
+  
+  while (parent) {
+    if (parent.tagName === 'UL' || parent.tagName === 'OL') {
+      const grandParent = parent.parentElement;
+      if (grandParent && grandParent.tagName === 'LI') {
+        level++;
+      }
+    }
+    parent = parent.parentElement;
+  }
+  
+  return level;
+}
+
+// Function to clean existing editor content while preserving lists
 function cleanEditorContent(editor) {
   if (!editor) return;
   
   // Get current content
   const delta = editor.getContents();
   
-  // Clean all operations
+  // Clean all operations while preserving list structure
   const cleanedOps = delta.ops.map(op => {
     if (op.attributes) {
       const cleanAttributes = { ...op.attributes };
@@ -752,8 +811,8 @@ function cleanEditorContent(editor) {
       delete cleanAttributes.size;
       delete cleanAttributes.font;
       
-      // Only keep basic formatting
-      const allowedAttributes = ['bold', 'italic', 'underline', 'color', 'list', 'header', 'link'];
+      // Keep essential formatting including lists and indentation
+      const allowedAttributes = ['bold', 'italic', 'underline', 'color', 'list', 'header', 'link', 'indent'];
       Object.keys(cleanAttributes).forEach(key => {
         if (!allowedAttributes.includes(key)) {
           delete cleanAttributes[key];
@@ -767,6 +826,76 @@ function cleanEditorContent(editor) {
   
   // Set cleaned content
   editor.setContents({ ops: cleanedOps });
+}
+
+// Function to fix pasted list formatting
+function fixListFormatting(editor) {
+  if (!editor) return;
+  
+  const delta = editor.getContents();
+  let needsUpdate = false;
+  
+  // Process operations to fix list formatting
+  const fixedOps = delta.ops.map((op, index) => {
+    if (op.insert && typeof op.insert === 'string') {
+      const text = op.insert;
+      
+      // Check if this looks like a list item that got flattened
+      if (text.includes('\n') && (text.includes('•') || text.includes('-') || /^\d+\./.test(text.trim()))) {
+        needsUpdate = true;
+        
+        // Split into proper list items
+        const lines = text.split('\n').filter(line => line.trim());
+        const newOps = [];
+        
+        lines.forEach((line, lineIndex) => {
+          const trimmedLine = line.trim();
+          if (trimmedLine) {
+            // Detect list type and indentation
+            let listType = 'bullet';
+            let indent = 0;
+            let cleanText = trimmedLine;
+            
+            // Count leading spaces/tabs for indentation
+            const leadingSpaces = line.match(/^\s*/)[0].length;
+            indent = Math.floor(leadingSpaces / 4); // 4 spaces = 1 indent level
+            
+            // Remove bullet points or numbers
+            if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-')) {
+              cleanText = trimmedLine.substring(1).trim();
+              listType = 'bullet';
+            } else if (/^\d+\./.test(trimmedLine)) {
+              cleanText = trimmedLine.replace(/^\d+\.\s*/, '');
+              listType = 'ordered';
+            }
+            
+            // Create list item operation
+            const attributes = { list: listType };
+            if (indent > 0) {
+              attributes.indent = indent;
+            }
+            
+            newOps.push({
+              insert: cleanText,
+              attributes: attributes
+            });
+            
+            if (lineIndex < lines.length - 1) {
+              newOps.push({ insert: '\n' });
+            }
+          }
+        });
+        
+        return newOps;
+      }
+    }
+    
+    return op;
+  }).flat();
+  
+  if (needsUpdate) {
+    editor.setContents({ ops: fixedOps });
+  }
 }
 
 function initializeEditors() {
@@ -804,7 +933,7 @@ function initializeEditors() {
   const editorModules = {
     toolbar: toolbarOptions,
     clipboard: {
-      matchVisual: false,
+      matchVisual: true,
       matchers: []
     },
     keyboard: {
@@ -880,6 +1009,13 @@ function initializeEditors() {
         modules: editorModules
       });
       enablePaste(editors[editorId]);
+      
+      // Add paste event listener for list formatting
+      editors[editorId].root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(editors[editorId]);
+        }, 100);
+      });
     }
   });
   
@@ -896,6 +1032,14 @@ function initializeEditors() {
           modules: { toolbar: toolbarOptions }
         });
         enablePaste(editors[editorId]);
+        
+        // Add paste event listener for list formatting
+        editors[editorId].root.addEventListener('paste', () => {
+          setTimeout(() => {
+            fixListFormatting(editors[editorId]);
+          }, 100);
+        });
+        
         console.log(`✓ Business editor initialized: ${editorId}`);
       } catch (error) {
         console.error(`✗ Failed to initialize business editor ${editorId}:`, error);
@@ -930,6 +1074,13 @@ function initializeEditors() {
       // Clean any existing content and force consistent formatting
       setTimeout(() => {
         cleanEditorContent(editors[config.id]);
+        
+        // Add paste event listener to fix list formatting
+        editors[config.id].root.addEventListener('paste', () => {
+          setTimeout(() => {
+            fixListFormatting(editors[config.id]);
+          }, 100);
+        });
       }, 50);
       
       // Force toolbar visibility after creation
@@ -1743,6 +1894,13 @@ function addBirthday() {
       
       enablePaste(editor);
       
+      // Add paste event listener for list formatting
+      editor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(editor);
+        }, 100);
+      });
+      
       editors[wishesEditorId] = editor;
     }
   });
@@ -1797,6 +1955,13 @@ function addBusinessTopic() {
     }
   });
   enablePaste(editor);
+  
+  // Add paste event listener for list formatting
+  editor.root.addEventListener('paste', () => {
+    setTimeout(() => {
+      fixListFormatting(editor);
+    }, 100);
+  });
   
   editors[editorId] = editor;
 }
@@ -1880,6 +2045,13 @@ function addAwardWinner() {
         }
       });
       enablePaste(editor);
+      
+      // Add paste event listener for list formatting
+      editor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(editor);
+        }, 100);
+      });
       
       editors[editorId] = editor;
     }
@@ -1994,6 +2166,13 @@ function addSpotlightPerson() {
       });
       enablePaste(growthEditor);
       
+      // Add paste event listener for list formatting
+      growthEditor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(growthEditor);
+        }, 100);
+      });
+      
       editors[growthEditorId] = growthEditor;
     }
     
@@ -2007,6 +2186,13 @@ function addSpotlightPerson() {
         }
       });
       enablePaste(reasonEditor);
+      
+      // Add paste event listener for list formatting
+      reasonEditor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(reasonEditor);
+        }, 100);
+      });
       
       editors[reasonEditorId] = reasonEditor;
     }
@@ -2022,6 +2208,13 @@ function addSpotlightPerson() {
       });
       enablePaste(quoteEditor);
       
+      // Add paste event listener for list formatting
+      quoteEditor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(quoteEditor);
+        }, 100);
+      });
+      
       editors[quoteEditorId] = quoteEditor;
     }
     
@@ -2035,6 +2228,13 @@ function addSpotlightPerson() {
         }
       });
       enablePaste(factsEditor);
+      
+      // Add paste event listener for list formatting
+      factsEditor.root.addEventListener('paste', () => {
+        setTimeout(() => {
+          fixListFormatting(factsEditor);
+        }, 100);
+      });
       
       editors[factsEditorId] = factsEditor;
     }
@@ -2077,34 +2277,66 @@ function convertWhiteTextToBlack(html) {
                      .replace(/color:\s*white/gi, 'color: #333333')
                      .replace(/color:\s*rgb\(255,\s*255,\s*255\)/gi, 'color: #333333');
   
-  // Strip HTML tags for plain text
-  cleanHtml = cleanHtml.replace(/<[^>]*>/g, '');
+  // Convert text that looks like lists into proper HTML lists
+  cleanHtml = formatTextAsLists(cleanHtml);
   
   // Convert Quill indentation classes to inline styles
   for (let i = 1; i <= 8; i++) {
     const indentValue = i * 30;
-    // Handle list items with indentation
     cleanHtml = cleanHtml.replace(new RegExp(`<li([^>]*class="[^"]*ql-indent-${i}[^"]*")([^>]*)>`, 'gi'), 
                                   `<li$2 style="margin-left: ${indentValue}px; list-style-position: inside;">`);
-    // Handle paragraphs with indentation
     cleanHtml = cleanHtml.replace(new RegExp(`<p([^>]*class="[^"]*ql-indent-${i}[^"]*")([^>]*)>`, 'gi'), 
                                   `<p$2 style="padding-left: ${indentValue}px;">`);
   }
   
-  // Remove any remaining class attributes
+  // Remove class attributes
   cleanHtml = cleanHtml.replace(/class="[^"]*"/gi, '');
   
-  // Ensure consistent font size and alignment for all elements  
+  // Apply consistent styling
   cleanHtml = cleanHtml.replace(/<p([^>]*)>/gi, '<p$1 style="font-size: 16px; line-height: 1.6; text-align: left; margin: 8px 0;">')
                       .replace(/<li([^>]*)>/gi, '<li$1 style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">')
                       .replace(/<ul([^>]*)>/gi, '<ul$1 style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">')
-                      .replace(/<ol([^>]*)>/gi, '<ol$1 style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">')
-                      .replace(/<h1([^>]*)>/gi, '<h1$1 style="text-align: left; margin: 12px 0 8px 0;">')
-                      .replace(/<h2([^>]*)>/gi, '<h2$1 style="text-align: left; margin: 12px 0 8px 0;">')
-                      .replace(/<h3([^>]*)>/gi, '<h3$1 style="text-align: left; margin: 12px 0 8px 0;">')
-                      .replace(/<h4([^>]*)>/gi, '<h4$1 style="text-align: left; margin: 12px 0 8px 0;">');
+                      .replace(/<ol([^>]*)>/gi, '<ol$1 style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">');
   
   return cleanHtml;
+}
+
+// Format plain text that contains list-like content into proper HTML lists
+function formatTextAsLists(html) {
+  // If it's already proper HTML with tags, return as is
+  if (html.includes('<ul>') || html.includes('<ol>') || html.includes('<li>')) {
+    return html;
+  }
+  
+  // Check if this is plain text that needs list formatting
+  const text = html.replace(/<[^>]*>/g, ''); // Strip any existing tags
+  
+  // Split by common separators that indicate list items
+  const lines = text.split(/(?=[A-Z][^:]*:)|(?=\d+\.)/).filter(line => line.trim());
+  
+  if (lines.length > 1) {
+    let formattedHtml = '<ul style="font-size: 16px; text-align: left; padding-left: 20px; margin: 8px 0;">';
+    
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed) {
+        // Clean up the line and make it a list item
+        let cleanLine = trimmed;
+        
+        // Remove trailing periods or colons that might be separators
+        if (cleanLine.endsWith('.') && !cleanLine.match(/\d+\.$/) && cleanLine.length > 1) {
+          cleanLine = cleanLine.slice(0, -1);
+        }
+        
+        formattedHtml += `<li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${cleanLine}</li>`;
+      }
+    });
+    
+    formattedHtml += '</ul>';
+    return formattedHtml;
+  }
+  
+  return html;
 }
 
 // Generate HTML for template sections following Turbify template structure
@@ -2375,9 +2607,9 @@ async function generateHTML() {
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${topic.content}${topic.link ? ` <a href="${topic.link}">here</a>` : ''}</li>
-                </ul>
+                <div style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                  ${topic.content}${topic.link ? ` <a href="${topic.link}">Read more</a>` : ''}
+                </div>
               `).join('')}
               ${activities ? `
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -2387,9 +2619,9 @@ async function generateHTML() {
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
-                </ul>
+                <div style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                  ${activities}
+                </div>
                 ${sectionImages.activities && sectionImages.activities.length > 0 ? `
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                   <tr>
@@ -2452,7 +2684,8 @@ async function generateHTML() {
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
               <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
                 <h2 style="text-align: center;">Monthly Spotlight</h2>
-                ${spotlightPeople.map(person => `
+                ${spotlightPeople.map((person, index) => `
+                  ${index > 0 ? '<h2 style="text-align: center;">Monthly Spotlight</h2>' : ''}
                   ${person.photo ? `
                     <div style="text-align: center; margin-bottom: 20px;">
                       <img src="${person.photo}" alt="${person.name}" style="width: 120px; height: auto; border-radius: 8px;" />
