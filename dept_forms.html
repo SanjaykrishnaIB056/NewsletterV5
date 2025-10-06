@@ -2062,8 +2062,11 @@ async function generateHTML() {
     const name = nameEl?.value || '';
     const date = dateEl?.value || '';
     const image = entry.getAttribute('data-image') || '';
-    console.log(`Birthday ${index}:`, { name, date, image, nameEl, dateEl });
-    return { name: name.trim(), date, image };
+    const wishesEditor = entry.querySelector('.birthday-wishes-editor');
+    const wishesEditorId = wishesEditor?.getAttribute('data-editor');
+    const wishes = editors[wishesEditorId] ? editors[wishesEditorId].root.innerHTML : '';
+    console.log(`Birthday ${index}:`, { name, date, image, wishes, nameEl, dateEl });
+    return { name: name.trim(), date, image, wishes };
   }).filter(b => b.name);
   
   console.log('Final HR Data collected:', { joiners, birthdays });
@@ -2336,32 +2339,27 @@ async function generateHTML() {
               ${birthdays.length > 0 ? `
               <h3 style="color: #0039A7; margin-top: 40px;">🎂 Happy Birthday To:</h3>
               <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse;">
-                ${birthdays.map(b => `
                 <tr>
-                  <td valign="top" style="width: 33%; padding: 10px;">
-                    <table cellpadding="0" cellspacing="0" border="0">
-                      <tr>
-                        <td width="60" valign="top" align="left" style="padding-right: 10px;">
-                          ${b.image ? `
-                            <!--[if mso]>
-                            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
-                              <v:fill type="frame" src="${b.image}" />
-                            </v:roundrect>
-                            <![endif]-->
-                            <!--[if !mso]><!-- -->
-                            <img src="${b.image}" alt="${b.name}" width="80" height="80" style="border-radius: 50%; object-fit: cover; display: block;" />
-                            <!--<![endif]-->
-                          ` : ''}
-                        </td>
-                        <td valign="top" style="font-size: 14px;">
-                          <strong>${b.name}</strong> – ${b.date ? new Date(b.date).toLocaleDateString() : ''}<br />
-                          <em style="font-size: 13px;">Wishing you an amazing year ahead! 🎉</em>
-                        </td>
-                      </tr>
-                    </table>
+                  ${birthdays.slice(0, 3).map(b => `
+                  <td valign="top" style="width: 33%; text-align: center; padding: 10px;">
+                    ${b.image ? `
+                      <!--[if mso]>
+                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" arcsize="50%" stroke="f" fill="t" style="width:80px;height:80px;">
+                        <v:fill type="frame" src="${b.image}" />
+                      </v:roundrect>
+                      <![endif]-->
+                      <!--[if !mso]><!-- -->
+                      <img src="${b.image}" alt="${b.name}" width="80" height="80" style="border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px;" />
+                      <!--<![endif]-->
+                    ` : ''}
+                    <p style="margin: 0; font-size: 14px;">
+                      <strong>${b.name}</strong><br>
+                      ${b.date ? new Date(b.date).toLocaleDateString() : ''}<br>
+                      <em style="font-size: 13px;">${b.wishes && b.wishes.trim() && b.wishes !== '<p><br></p>' ? b.wishes.replace(/<[^>]*>/g, '') : 'Wishing you an amazing year ahead! 🎉'}</em>
+                    </p>
                   </td>
+                  `).join('')}
                 </tr>
-                `).join('')}
               </table>
               ` : ''}
             </td>
