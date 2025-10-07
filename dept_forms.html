@@ -676,7 +676,35 @@
               </div>
               <div class="form-group mt-6">
                 <label class="block text-sm font-medium mb-2 text-neutral-300"
-                  >Team Building Activities:</label
+                  >Team Activities Title:</label
+                >
+                <input
+                  type="text"
+                  id="activities-title"
+                  value="Team Building Activities"
+                  class="w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white mb-3"
+                  placeholder="Enter custom title for team activities"
+                />
+                <label class="block text-sm font-medium mb-2 text-neutral-300"
+                  >Title Color:</label
+                >
+                <div class="flex items-center gap-2 mb-3">
+                  <input
+                    type="color"
+                    id="activities-title-color"
+                    value="#FEA702"
+                    class="w-12 h-10 rounded border border-neutral-600"
+                  />
+                  <input
+                    type="text"
+                    id="activities-title-color-hex"
+                    value="#FEA702"
+                    class="flex-1 p-2 bg-neutral-700 text-white rounded border border-neutral-600"
+                    placeholder="#FEA702"
+                  />
+                </div>
+                <label class="block text-sm font-medium mb-2 text-neutral-300"
+                  >Team Activities Content:</label
                 >
                 <div
                   id="activities-editor"
@@ -970,13 +998,13 @@
                       <div class="form-group">
                         <label
                           class="block text-sm font-medium mb-2 text-neutral-300"
-                          >Key Project:</label
+                          >Key Projects:</label
                         >
-                        <input
-                          type="text"
-                          placeholder="Main project"
+                        <textarea
+                          placeholder="Describe main projects (one per line)"
                           class="spotlight-project w-full p-3 border border-neutral-600 rounded-lg bg-neutral-800 text-white focus:bg-neutral-600"
-                        />
+                          rows="3"
+                        ></textarea>
                       </div>
                       <div class="form-group">
                         <label
@@ -2951,26 +2979,33 @@
             content.trim() !== "" &&
             content.trim() !== "<p><br></p>";
 
+          // Use the section's configured color, fallback to default colors
+          const sectionColor = section.color || (level === 0 ? "#0039A7" : "#FEA702");
+
           if (section.headingOnly) {
             // Heading-only sections using Turbify template structure
             if (level === 0) {
               sectionContent += `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>${section.title}</center></h3>
+              <h3 style="font-size: 18px; color: ${sectionColor}"><center>${section.title}</center></h3>
             </td>
           </tr>`;
             } else {
               sectionContent += `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="padding-left: ${level * 20}px;">
-                <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${
-                  section.title
-                }</h4>
-              </td>
-            </tr>
-          </table>`;
+          <tr>
+            <td style="padding: 15px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-left: ${level * 20}px;">
+                    <h4 style="color: ${sectionColor}; font-size: 16px; margin: 0;">${
+                      section.title
+                    }</h4>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`;
             }
             hasContent = true;
           } else if (hasValidContent) {
@@ -2979,7 +3014,7 @@
               sectionContent += `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>${section.title}</center></h3>
+              <h3 style="font-size: 18px; color: ${sectionColor}"><center>${section.title}</center></h3>
             </td>
           </tr>
           <tr>
@@ -2989,20 +3024,24 @@
           </tr>`;
             } else {
               sectionContent += `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="padding-left: ${level * 20}px;">
-                <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${
-                  section.title
-                }</h4>
-              </td>
-            </tr>
-          </table>
-          <div style="margin-left: ${
-            (level + 1) * 20
-          }px; font-size: 16px; line-height: 1.6; text-align: left;">
-            ${content}
-          </div>`;
+          <tr>
+            <td style="padding: 15px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-left: ${level * 20}px;">
+                    <h4 style="color: ${sectionColor}; font-size: 16px; margin: 0;">${
+                      section.title
+                    }</h4>
+                    <div style="margin-left: ${
+                      20
+                    }px; font-size: 16px; line-height: 1.6; text-align: left; margin-top: 10px;">
+                      ${content}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`;
             }
             hasContent = true;
           }
@@ -3137,6 +3176,8 @@
         const activities = convertWhiteTextToBlack(
           editors["activities-editor"].root.innerHTML
         );
+        const activitiesTitle = document.getElementById("activities-title")?.value || "Team Building Activities";
+        const activitiesTitleColor = document.getElementById("activities-title-color")?.value || "#FEA702";
 
         const mainContent = editors["main-editor"]
           ? convertWhiteTextToBlack(editors["main-editor"].root.innerHTML)
@@ -3291,7 +3332,7 @@
               ? `
           <tr>
             <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7"><center>📊 Turbify Business Updates</center></h3>
+              <h3 style="font-size: 18px; color: #0039A7">📊 Turbify Business Updates</h3>
             </td>
           </tr>
           <tr>
@@ -3305,14 +3346,14 @@
                       <h4 style="color: #FEA702; font-size: 16px; margin: 0;">${
                         topic.title
                       }</h4>
+                      <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                        <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${
+                          topic.content
+                        }${topic.link ? ` <a href="${topic.link}">here</a>` : ""}</li>
+                      </ul>
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${
-                    topic.content
-                  }${topic.link ? ` <a href="${topic.link}">here</a>` : ""}</li>
-                </ul>
               `
                 )
                 .join("")}
@@ -3322,44 +3363,44 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td style="padding-left: 20px;">
-                      <h4 style="color: #FEA702; font-size: 16px; margin: 0;">🎉 Team Building Activities</h4>
+                      <h4 style="color: ${activitiesTitleColor}; font-size: 16px; margin: 0;">🎉 ${activitiesTitle}</h4>
+                      <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
+                        <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
+                      </ul>
+                      ${
+                        sectionImages.activities &&
+                        sectionImages.activities.length > 0
+                          ? `
+                      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          ${sectionImages.activities
+                            .slice(0, 3)
+                            .map(
+                              (img) => `
+                          <td valign="top" style="padding: 10px; width: 33.33%;">
+                            <!--[if mso]>
+                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:300px;height:225px;">
+                            <v:fill type="frame" src="${img}" />
+                            <v:textbox inset="0,0,0,0">
+                            </v:textbox>
+                            </v:rect>
+                            <![endif]-->
+                            <!--[if !mso]><!-- -->
+                            <img src="${img}" alt="Activity" width="300" height="225" class="activity-img"
+                              style="display: block; margin: 0 auto 10px; max-width: 100%; height: auto;" />
+                            <!--<![endif]-->
+                          </td>
+                          `
+                            )
+                            .join("")}
+                        </tr>
+                      </table>
+                      `
+                          : ""
+                      }
                     </td>
                   </tr>
                 </table>
-                <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
-                  <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${activities}</li>
-                </ul>
-                ${
-                  sectionImages.activities &&
-                  sectionImages.activities.length > 0
-                    ? `
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                  <tr>
-                    ${sectionImages.activities
-                      .slice(0, 3)
-                      .map(
-                        (img) => `
-                    <td valign="top" style="padding: 10px;">
-                      <!--[if mso]>
-                      <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:300px;height:225px;">
-                      <v:fill type="frame" src="${img}" />
-                      <v:textbox inset="0,0,0,0">
-                      </v:textbox>
-                      </v:rect>
-                      <![endif]-->
-                      <!--[if !mso]><!-- -->
-                      <img src="${img}" alt="Activity" width="300" height="225" class="activity-img"
-                        style="display: block; margin: 0 auto 10px; max-width: 100%; height: auto;" />
-                      <!--<![endif]-->
-                    </td>
-                    `
-                      )
-                      .join("")}
-                  </tr>
-                </table>
-                `
-                    : ""
-                }
               `
                   : ""
               }
@@ -3422,22 +3463,22 @@
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
               <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
-                <h2 style="text-align: center;">Monthly Spotlight</h2>
                 ${spotlightPeople
                   .map(
                     (person) => `
+                <h2 style="text-align: center;">Monthly Spotlight</h2>
                   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
                     <tr>
-                      <td align="center" style="width: 450px; height: 300px; padding-bottom: 20px;">
+                      <td align="center" style="padding: 0; margin: 0;">
                         ${
                           person.photo
                             ? `
                           <!--[if mso]>
                           <img src="${person.photo}" width="290px" height="240px"
-                               style="display: block; border: 0;" border="0" alt="${person.name}">
+                               style="display: block; border: 0; margin: 0 auto;" border="0" alt="${person.name}">
                           <![endif]-->
                           <!--[if !mso]><!-- -->
-                          <img src="${person.photo}" alt="${person.name}" class="responsive-img" style="align-items: center; width: 290px; height: 240px; border-radius: 8px; max-width: 100%;" />
+                          <img src="${person.photo}" alt="${person.name}" style="display: block; margin: 0 auto; width: 290px; height: 240px; border-radius: 8px;" />
                           <!--<![endif]-->
                         `
                             : ""
@@ -3453,11 +3494,11 @@
                         <p><strong style="color: #0039A7; font-size: 16px;">Tenure:</strong> ${
                           person.tenure
                         }</p>
-                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Key Projects</h4>
+                        <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 18px;">Key Projects</h4>
                         <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                          <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${
-                            person.project
-                          }</li>
+                          ${person.project.split('\n').filter(p => p.trim()).map(project => 
+                            `<li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 8px;">${project.trim()}</li>`
+                          ).join('')}
                         </ul>
                       </td>
                     </tr>
@@ -3493,9 +3534,9 @@
                           person.quote
                             ? `
                         <h4 style="margin: 15px 0 8px; color: #0039A7; font-size: 16px;">Quote</h4>
-                        <p style="margin: 0 0 12px; font-size: 16px; color: #666; line-height: 1.4; font-style: italic; padding: 20px; background-color: #f5f7fc; border-left: 4px solid #0039A7;">
-                          "${person.quote}"
-                        </p>
+                        <div style="margin: 0 0 12px; font-size: 16px; color: #666; line-height: 1.4; font-style: italic; padding: 20px; background-color: #f5f7fc; border-left: 4px solid #0039A7;">
+                          ${person.quote}
+                        </div>
                         `
                             : ""
                         }
@@ -3891,6 +3932,10 @@
         if (editors["activities-editor"] && editors["activities-editor"].root) {
           data.activities = editors["activities-editor"].root.innerHTML;
         }
+        
+        // Collect activities title and color
+        data.activitiesTitle = document.getElementById("activities-title")?.value || "Team Building Activities";
+        data.activitiesTitleColor = document.getElementById("activities-title-color")?.value || "#FEA702";
         if (editors["main-editor"] && editors["main-editor"].root) {
           data.mainContent = editors["main-editor"].root.innerHTML;
         }
@@ -4442,6 +4487,26 @@
         return flattened;
       }
 
+      // Setup color picker sync for activities title
+      function setupActivitiesColorPicker() {
+        const colorPicker = document.getElementById("activities-title-color");
+        const colorHex = document.getElementById("activities-title-color-hex");
+        
+        if (colorPicker && colorHex) {
+          colorPicker.addEventListener('change', (e) => {
+            colorHex.value = e.target.value;
+            updateLastUserAction();
+          });
+          
+          colorHex.addEventListener('input', (e) => {
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+              colorPicker.value = e.target.value;
+              updateLastUserAction();
+            }
+          });
+        }
+      }
+
       // Initialize on page load
       document.addEventListener("DOMContentLoaded", async function () {
         // Check if we have a current project, if not redirect based on role
@@ -4544,6 +4609,9 @@
               console.error("Failed to load data after editors ready:", error);
             }
 
+            // Setup color picker for activities
+            setupActivitiesColorPicker();
+
             // Add change tracking without auto-save
             Object.keys(editors).forEach((editorId) => {
               if (editors[editorId] && editors[editorId].on) {
@@ -4623,6 +4691,20 @@
           editors["activities-editor"].clipboard.dangerouslyPasteHTML(
             data.activities
           );
+        }
+        
+        // Load activities title and color
+        const activitiesTitleInput = document.getElementById("activities-title");
+        if (activitiesTitleInput && data.activitiesTitle) {
+          activitiesTitleInput.value = data.activitiesTitle;
+        }
+        const activitiesTitleColorInput = document.getElementById("activities-title-color");
+        const activitiesTitleColorHexInput = document.getElementById("activities-title-color-hex");
+        if (activitiesTitleColorInput && data.activitiesTitleColor) {
+          activitiesTitleColorInput.value = data.activitiesTitleColor;
+          if (activitiesTitleColorHexInput) {
+            activitiesTitleColorHexInput.value = data.activitiesTitleColor;
+          }
         }
         if (editors["main-editor"] && data.mainContent) {
           editors["main-editor"].clipboard.dangerouslyPasteHTML(

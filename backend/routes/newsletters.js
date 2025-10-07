@@ -83,27 +83,40 @@ router.post('/:projectId', authMiddleware, async (req, res) => {
     allowedFields.forEach(field => {
       if (updateData.hasOwnProperty(field)) {
         let value = updateData[field];
-        // Parse JSON strings for array fields
+        
+        // Special handling for array fields that need JSON parsing
         if (['awards', 'businessTopics', 'spotlight', 'joiners', 'birthdays', 'sectionImages'].includes(field)) {
+          console.log(`Processing ${field}, original type:`, typeof value, 'value:', value);
+          
           if (typeof value === 'string') {
             try {
               value = JSON.parse(value);
-              // Handle double-stringified data
-              if (typeof value === 'string') {
+              // Handle multiple levels of stringification
+              while (typeof value === 'string') {
+                console.log(`Double-stringified ${field}, parsing again...`);
                 value = JSON.parse(value);
               }
+              console.log(`Parsed ${field} successfully:`, value);
             } catch (e) {
-              console.log(`Failed to parse ${field}:`, e.message);
+              console.error(`Failed to parse ${field}:`, e.message, 'Original value:', updateData[field]);
               value = field === 'sectionImages' ? {} : [];
             }
           }
-          // Ensure proper structure
-          if (field === 'sectionImages' && typeof value !== 'object') {
-            value = {};
-          } else if (field !== 'sectionImages' && !Array.isArray(value)) {
-            value = [];
+          
+          // Validate and ensure proper structure
+          if (field === 'sectionImages') {
+            if (typeof value !== 'object' || Array.isArray(value)) {
+              console.log(`Invalid sectionImages structure, resetting to empty object`);
+              value = {};
+            }
+          } else {
+            if (!Array.isArray(value)) {
+              console.log(`Invalid ${field} structure, resetting to empty array`);
+              value = [];
+            }
           }
         }
+        
         filteredData[field] = value;
       }
     });
