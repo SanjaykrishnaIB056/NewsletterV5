@@ -3462,32 +3462,37 @@
               ? `
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <section style="max-width: 800px; margin: auto; font-family: Arial, sans-serif;">
                 ${spotlightPeople
                   .map(
                     (person) => `
-                <h2 style="text-align: center;">Monthly Spotlight</h2>
-                  <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                    <tr>
-                      <td align="center" style="padding: 0; margin: 0;">
-                        ${
-                          person.photo
-                            ? `
-                          <!--[if mso]>
-                          <img src="${person.photo}" width="290px" height="240px"
-                               style="display: block; border: 0; margin: 0 auto;" border="0" alt="${person.name}">
-                          <![endif]-->
-                          <!--[if !mso]><!-- -->
-                          <img src="${person.photo}" alt="${person.name}" style="display: block; margin: 0 auto; width: 290px; height: 240px; border-radius: 8px;" />
-                          <!--<![endif]-->
-                        `
-                            : ""
-                        }
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="vertical-align: top;">
-                        <h3>Meet ${person.name}</h3>
+                <h2 style="text-align: center; margin: 20px 0;">Monthly Spotlight</h2>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                  <tr>
+                    <td align="center" style="text-align: center; padding: 20px 0;">
+                      ${
+                        person.photo
+                          ? `
+                        <!--[if mso]>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td align="center">
+                              <img src="${person.photo}" width="290" height="240" style="display: block;" alt="${person.name}">
+                            </td>
+                          </tr>
+                        </table>
+                        <![endif]-->
+                        <!--[if !mso]><!-- -->
+                        <img src="${person.photo}" alt="${person.name}" width="290" height="240" 
+                             style="display: block; margin: 0 auto; border-radius: 8px;" />
+                        <!--<![endif]-->
+                      `
+                          : ""
+                      }
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 20px; text-align: left;">
+                      <h3 style="text-align: center; margin: 0 0 20px 0;">Meet ${person.name}</h3>
                         <p><strong style="color: #0039A7; font-size: 16px;">Role:</strong> ${
                           person.role
                         }</p>
@@ -3500,10 +3505,10 @@
                             `<li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 8px;">${project.trim()}</li>`
                           ).join('')}
                         </ul>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colspan="2">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 0 20px 20px 20px;">
                         <h4 style="margin: 0 0 8px; color: #0039A7; font-size: 16px;">Tech Stack</h4>
                         <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
                           <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${
@@ -3550,9 +3555,9 @@
                         `
                             : ""
                         }
-                      </td>
-                    </tr>
-                  </table>
+                    </td>
+                  </tr>
+                </table>
                 `
                   )
                   .join("")}
@@ -3697,10 +3702,8 @@
               ? `
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <h2 style="color: #0039A7;">📅 Upcoming Events</h2>
-              <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px;">
-                <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${events}</li>
-              </ul>
+              <h2 style="color: #0039A7; text-align: left;">📅 Upcoming Events</h2>
+              <div style="text-align: left;">${events}</div>
             </td>
           </tr>
           `
@@ -3712,8 +3715,8 @@
               ? `
           <tr>
             <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <h2 style="color: #0039A7;">📝 Notes</h2>
-              <div>${notes}</div>
+              <h2 style="color: #0039A7; text-align: left;">📝 Notes</h2>
+              <div style="text-align: left;">${notes}</div>
             </td>
           </tr>
           `

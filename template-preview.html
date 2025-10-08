@@ -1,161 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Template Preview</title>
-<style>
-body {
-  margin: 0;
-  padding: 20px;
-  background-color: #f4f6f8;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #111;
-}
-.preview-container {
-  max-width: 600px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-.header {
-  padding: 24px 28px;
-  border-bottom: 1px solid #e6e9ec;
-  text-align: center;
-}
-.logo {
-  margin-bottom: 16px;
-}
-.title {
-  margin: 0;
-  font-size: 20px;
-  color: #0b63a6;
-}
-.subtitle {
-  margin: 6px 0 0;
-  color: #6b7280;
-  font-size: 13px;
-}
-.section {
-  padding: 20px 28px;
-}
-.section-title {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: #0b63a6;
-}
-.content {
-  font-size: 14px;
-  color: #111;
-  line-height: 1.5;
-}
-.footer {
-  padding: 16px 28px;
-  background: #fafbfc;
-  border-top: 1px solid #e6e9ec;
-  text-align: center;
-  font-size: 12px;
-  color: #6b7280;
-}
-</style>
-</head>
-<body>
-<div class="preview-container">
-  <div class="header">
-    <div class="logo">
-      <img src="https://sep.turbifycdn.com/nrp/image/turbify/newturbifylogo.png" style="height: 40px" alt="Company Logo">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Template Preview</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f6f8;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111;
+      }
+      .preview-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      .header {
+        padding: 24px 28px;
+        border-bottom: 1px solid #e6e9ec;
+        text-align: center;
+      }
+      .logo {
+        margin-bottom: 16px;
+      }
+      .title {
+        margin: 0;
+        font-size: 20px;
+        color: #0b63a6;
+      }
+      .subtitle {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+      }
+      .section {
+        padding: 20px 28px;
+      }
+      .section-title {
+        margin: 0 0 10px;
+        font-size: 16px;
+        color: #0b63a6;
+      }
+      .content {
+        font-size: 14px;
+        color: #111;
+        line-height: 1.5;
+      }
+      .footer {
+        padding: 16px 28px;
+        background: #fafbfc;
+        border-top: 1px solid #e6e9ec;
+        text-align: center;
+        font-size: 12px;
+        color: #6b7280;
+      }
+      .section .content img {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .section .content.spotlight {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preview-container">
+      <div class="header">
+        <div class="logo">
+          <img
+            src="https://sep.turbifycdn.com/nrp/image/turbify/newturbifylogo.png"
+            style="height: 40px"
+            alt="Company Logo"
+          />
+        </div>
+        <h1 class="title" id="newsletter-title">Company Newsletter</h1>
+        <p class="subtitle">Monthly Newsletter | December 2024</p>
+      </div>
+
+      <div class="section">
+        <div class="content">
+          <p>
+            Welcome to our monthly newsletter! Here's what's been happening at
+            our company this month.
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">⚙ Engineering Team Updates</h2>
+        <div class="content">
+          <p><strong>🚀 Platform Updates</strong></p>
+          <p>
+            Our platform team has been working on exciting new features to
+            improve user experience.
+          </p>
+
+          <p><strong>🔐 Pre-Sales Updates</strong></p>
+          <p>
+            The pre-sales team has successfully onboarded several new enterprise
+            clients.
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">📊 Business Updates</h2>
+        <div class="content">
+          <p><strong>Quarterly Roadmap</strong></p>
+          <p>
+            We've outlined our strategic initiatives for the upcoming quarter.
+          </p>
+
+          <p><strong>🏏 Team Activities</strong></p>
+          <p>
+            Our team participated in various team-building activities this
+            month.
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">🏆 Awards & Recognition</h2>
+        <div class="content">
+          <p>
+            <strong>John Doe</strong> — Software Engineer: Outstanding
+            contribution to the platform architecture.
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">Monthly Spotlight</h2>
+        <div class="content spotlight" style="text-align: center;">
+          <p><strong>Meet Jane Smith</strong></p>
+          <p>
+            <strong>Role:</strong> Senior Developer<br />
+            <strong>Tenure:</strong> 3 years<br />
+            <strong>Key Projects:</strong> API Gateway, Microservices
+            Architecture
+          </p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">👋 New Joiners</h2>
+        <div class="content">
+          <ul style="margin: 6px 0 0 16px; padding: 0">
+            <li>Alice Johnson – UX Designer</li>
+            <li>Bob Wilson – DevOps Engineer</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">📅 Upcoming Events</h2>
+        <div class="content">
+          <p>
+            Company All-Hands Meeting - January 15th<br />
+            Team Hackathon - January 20-21st
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p style="margin: 0 0 6px">
+          Let's keep the momentum going — here's to another successful month! 🚀
+        </p>
+        <p style="margin: 0">
+          This newsletter was sent to internal recipients.
+        </p>
+      </div>
     </div>
-    <h1 class="title" id="newsletter-title">Company Newsletter</h1>
-    <p class="subtitle">Monthly Newsletter | December 2024</p>
-  </div>
 
-  <div class="section">
-    <div class="content">
-      <p>Welcome to our monthly newsletter! Here's what's been happening at our company this month.</p>
-    </div>
-  </div>
+    <script>
+      // Get template type from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const template = urlParams.get("template");
 
-  <div class="section">
-    <h2 class="section-title">⚙ Engineering Team Updates</h2>
-    <div class="content">
-      <p><strong>🚀 Platform Updates</strong></p>
-      <p>Our platform team has been working on exciting new features to improve user experience.</p>
-      
-      <p><strong>🔐 Pre-Sales Updates</strong></p>
-      <p>The pre-sales team has successfully onboarded several new enterprise clients.</p>
-    </div>
-  </div>
+      if (template === "talent") {
+        // Customize for Talent template
+        document.getElementById("newsletter-title").textContent =
+          "Talent Newsletter";
+        document.querySelector(".title").style.color = "#059669"; // Green color for talent
+        document.querySelectorAll(".section-title").forEach((title) => {
+          title.style.color = "#059669";
+        });
 
-  <div class="section">
-    <h2 class="section-title">📊 Business Updates</h2>
-    <div class="content">
-      <p><strong>Quarterly Roadmap</strong></p>
-      <p>We've outlined our strategic initiatives for the upcoming quarter.</p>
-      
-      <p><strong>🏏 Team Activities</strong></p>
-      <p>Our team participated in various team-building activities this month.</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">🏆 Awards & Recognition</h2>
-    <div class="content">
-      <p><strong>John Doe</strong> — Software Engineer: Outstanding contribution to the platform architecture.</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">Monthly Spotlight</h2>
-    <div class="content">
-      <p><strong>Meet Jane Smith</strong></p>
-      <p><strong>Role:</strong> Senior Developer<br>
-      <strong>Tenure:</strong> 3 years<br>
-      <strong>Key Projects:</strong> API Gateway, Microservices Architecture</p>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">👋 New Joiners</h2>
-    <div class="content">
-      <ul style="margin: 6px 0 0 16px; padding: 0;">
-        <li>Alice Johnson – UX Designer</li>
-        <li>Bob Wilson – DevOps Engineer</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2 class="section-title">📅 Upcoming Events</h2>
-    <div class="content">
-      <p>Company All-Hands Meeting - January 15th<br>
-      Team Hackathon - January 20-21st</p>
-    </div>
-  </div>
-
-  <div class="footer">
-    <p style="margin: 0 0 6px;">Let's keep the momentum going — here's to another successful month! 🚀</p>
-    <p style="margin: 0;">This newsletter was sent to internal recipients.</p>
-  </div>
-</div>
-
-<script>
-// Get template type from URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-const template = urlParams.get('template');
-
-if (template === 'talent') {
-  // Customize for Talent template
-  document.getElementById('newsletter-title').textContent = 'Talent Newsletter';
-  document.querySelector('.title').style.color = '#059669'; // Green color for talent
-  document.querySelectorAll('.section-title').forEach(title => {
-    title.style.color = '#059669';
-  });
-  
-  // Add HR-specific content
-  const sections = document.querySelectorAll('.section');
-  sections[1].innerHTML = `
+        // Add HR-specific content
+        const sections = document.querySelectorAll(".section");
+        sections[1].innerHTML = `
     <h2 class="section-title">👥 HR Updates</h2>
     <div class="content">
       <p><strong>🎯 Talent Acquisition</strong></p>
@@ -165,8 +204,8 @@ if (template === 'talent') {
       <p>New training programs have been launched for skill development.</p>
     </div>
   `;
-  
-  sections[2].innerHTML = `
+
+        sections[2].innerHTML = `
     <h2 class="section-title">🎉 Employee Recognition</h2>
     <div class="content">
       <p><strong>Employee of the Month</strong></p>
@@ -176,7 +215,7 @@ if (template === 'talent') {
       <p>Several team members received recognition for their outstanding contributions.</p>
     </div>
   `;
-}
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>

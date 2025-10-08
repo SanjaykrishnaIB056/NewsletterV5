@@ -57,6 +57,7 @@ function getNewsletterHTML(recipientName, imageAttachments = []) {
         .content { padding: 20px; }
         .section { margin-bottom: 25px; }
         .section h3 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        .section img { display: block; margin: 0 auto; max-width: 100%; height: auto; }
         .footer { background: #ecf0f1; padding: 15px; text-align: center; color: #7f8c8d; }
     </style>
 </head>
@@ -86,6 +87,16 @@ function getNewsletterHTML(recipientName, imageAttachments = []) {
                 <h3>🏆 Awards & Performer of the Month</h3>
                 <p>👏 <strong>Congratulations to Priya Desai (QA Team)</strong><br>
                 Recognized as Performer of the Month for her dedication, speed in automation efforts, and mentorship. Well deserved!</p>
+            </div>
+
+            <div class="section">
+                <h3>🌟 Monthly Spotlight</h3>
+                <div style="text-align: center;">
+                    <p><strong>Meet Sarah Johnson</strong></p>
+                    <p><strong>Role:</strong> Senior Developer<br>
+                    <strong>Tenure:</strong> 2 years<br>
+                    <strong>Key Projects:</strong> API Gateway, Cloud Migration</p>
+                </div>
             </div>
 
             <div class="section">
