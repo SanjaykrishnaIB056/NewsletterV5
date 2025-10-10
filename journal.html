@@ -86,7 +86,7 @@
 
 <!-- Create Project Modal -->
 <div id="create-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-<div class="bg-neutral-800 rounded-lg p-6 w-full max-w-md mx-4">
+<div class="bg-neutral-800 rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
 <h3 class="text-xl font-bold text-white mb-4">Create New Entry</h3>
 <form id="create-form" class="space-y-4">
 <div>
@@ -147,11 +147,182 @@
 let projects = [];
 let filteredProjects = [];
 
+// Employee birthday data from Birthday.csv
+const employeeData = [
+  { name: "Sushant Kumar", birthday: "02-05", designation: "Technical Manager", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Sushant.png" },
+  { name: "Balamurali Ananthram", birthday: "07-24", designation: "Principal Architect", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sipra Priyadarsini", birthday: "05-14", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sunil Meesala", birthday: "11-17", designation: "Technical Architect", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Hari Babu Guttavilli", birthday: "07-01", designation: "Senior Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "K Mohanapriya", birthday: "08-31", designation: "Test Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "S R Yeshaswini", birthday: "12-29", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "B Darshan", birthday: "02-28", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Raju Mahadevamangalath Pisharam", birthday: "01-07", designation: "Program Director", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kavin Kumar S", birthday: "05-18", designation: "Associate Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Indala Rekha", birthday: "09-29", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kaparapu Sravani", birthday: "08-06", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Tyada Hima Bindu", birthday: "03-04", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Padma Priyanka Kotana", birthday: "08-10", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kuna Laxmana Rao", birthday: "05-28", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ummidi Siva Kalyani", birthday: "09-21", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Bhasyam Hemalatha", birthday: "12-25", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Nethiti Devi", birthday: "10-19", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Amit A Palekar", birthday: "05-11", designation: "Technical Architect", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Shaik Aslam Pasha", birthday: "04-22", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sivadi Radhika", birthday: "01-18", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ukoti Jahnavi", birthday: "10-06", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Priyanka B", birthday: "07-07", designation: "Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Adem Balu Mahendra", birthday: "02-22", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "G Gowtham Selvaraj", birthday: "11-14", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "NADAMBARAM GOWTHAM", birthday: "07-24", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Poreddy Rajashekhar reddy", birthday: "08-28", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sahana B R", birthday: "02-28", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mokka Vinodh Kumar", birthday: "06-04", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kasumuru Nagamani", birthday: "06-07", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Lakshmi thirupathamma M", birthday: "01-10", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Vishal M Patil", birthday: "12-31", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Saiveer Kondaveeti", birthday: "08-04", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Appikatla Deepika Rani", birthday: "07-21", designation: "Associate Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Pratyush Kumar Jha", birthday: "05-28", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kartik Sachdeva", birthday: "08-05", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Pavan Raghavendra Padaki", birthday: "07-14", designation: "Senior Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Nayana shree", birthday: "12-23", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mahesh Kumar", birthday: "09-11", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Dandamudi Naren", birthday: "07-24", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Parth Dutta", birthday: "04-07", designation: "Associate Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Nadapana Ayyappa Pavan Kumar", birthday: "07-05", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Lakkineni Hima Venkata Pradeep Raja", birthday: "11-07", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Orusu Ratna Mala", birthday: "02-18", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "karnati Rosik Raj", birthday: "12-30", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Gudla Sai Kiran", birthday: "06-07", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mayur Patil", birthday: "08-02", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mohammad Rahamathunisa", birthday: "04-19", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Shourabh Kumar Raja", birthday: "06-01", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mohammed Nafis", birthday: "05-19", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Adit Gupta", birthday: "01-28", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Shubh Singhal", birthday: "06-29", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Priyankadevi B", birthday: "02-21", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Surapelly Manohar", birthday: "06-20", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ragini Zapate", birthday: "06-01", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "J Bhargav", birthday: "06-09", designation: "Test Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sourav Ranjan Ram", birthday: "06-18", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Abhishesh Dubey", birthday: "07-14", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Bibina M", birthday: "10-10", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mahesh Patel", birthday: "02-07", designation: "Senior Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Prince Kumar", birthday: "10-14", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "S J Gambeer", birthday: "07-21", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Amulya", birthday: "06-05", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Naman Kumar", birthday: "11-26", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Rana Vikrant Singh Rathod", birthday: "12-16", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ismail Saheb Shaik", birthday: "06-22", designation: "Senior Project Manager", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Atul Bansal", birthday: "11-04", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ishwarya S P", birthday: "04-26", designation: "Senior Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Aishwarya Raghavendra Naik", birthday: "11-27", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ananda H N", birthday: "06-10", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sushanth S Shet", birthday: "12-20", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Pudi Rohini Prasad Reddy", birthday: "07-14", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Pavithra J", birthday: "02-19", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Papineni Triveni", birthday: "06-05", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Siriki Revathi", birthday: "12-17", designation: "Software Test Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Surabhi Bharti", birthday: "09-10", designation: "Project Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Akkireddy Muralidhar", birthday: "04-14", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Aishwarya Sagar", birthday: "01-15", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Manoj S Chougala", birthday: "02-14", designation: "Associate Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Rahul Kumar", birthday: "05-25", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Abhik Kumar Dey", birthday: "12-18", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Prashanthkumar", birthday: "10-10", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "B Arunkumar", birthday: "06-16", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Anand Rao Sindhe R", birthday: "08-04", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ragothaman N", birthday: "03-16", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kesavan Lakshmanan", birthday: "11-21", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Kavan Kumar K S", birthday: "05-15", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Katreddy Hari Satya Krishna", birthday: "12-03", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mohammed Ammar Idris", birthday: "07-27", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Johnson D", birthday: "12-05", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Naveen Wilson Alothu", birthday: "12-17", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "S M Ajay", birthday: "12-20", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Raghava B R", birthday: "01-08", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Victor Anand A", birthday: "02-05", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Vipeesh t", birthday: "04-08", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Dhanush Gatty", birthday: "02-23", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Manjunath B", birthday: "12-04", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Koduri S R N Santosh Kumar", birthday: "10-08", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sachin N B", birthday: "04-25", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Mohammed Ikramul Haq U", birthday: "05-02", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Vimal Venkadesan", birthday: "05-24", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "U Mohammed Hasan Saqib", birthday: "05-12", designation: "Consultant", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sanjay Krishna Srinivasan", birthday: "12-03", designation: "Trainee", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Rakesh R", birthday: "06-17", designation: "Trainee", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Dharani G", birthday: "09-15", designation: "Trainee", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sanath Kumar Pothula", birthday: "02-12", designation: "DevOps Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Anand Sreenivasan", birthday: "07-22", designation: "AWS Architect", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Fnu Dattatraya", birthday: "08-12", designation: "Senior Test Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Anastasiia Novoseltseva", birthday: "07-01", designation: "Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Ganesh Kaparapu", birthday: "05-27", designation: "Senior Software Engineer", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Reddy Sekhar Reddy Dandu", birthday: "06-04", designation: "Sr. Technical Architect", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Shiv Prakash", birthday: "09-09", designation: "Sr. Engineering Manager, Software Development", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Sai Prem Kumar Meda", birthday: "08-25", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Anjan Shah", birthday: "11-28", designation: "Technical Lead", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" },
+  { name: "Raghunandan Venkateswaran", birthday: "10-03", designation: "Sr. Technical Director", image: "https://sep.turbifycdn.com/yf/nrp/image/turbify/newsletter/Prince.png" }
+];
+
+function getBirthdaysByMonth(month) {
+  const monthStr = month.padStart(2, '0');
+  const birthdayWishes = [
+    "Wishing you an amazing year ahead! 🎉",
+    "Hope your special day is wonderful! 🎂",
+    "May all your dreams come true! ✨",
+    "Have a fantastic birthday celebration! 🎈",
+    "Sending you warm birthday wishes! 🌟",
+    "Hope your day is filled with joy! 😊",
+    "Celebrating another year of awesome! 🎊",
+    "May this year bring you happiness! 🌈",
+    "Wishing you success and joy! 🎁",
+    "Have a wonderful birthday! 🥳"
+  ];
+  
+  return employeeData
+    .filter(emp => emp.birthday.startsWith(monthStr))
+    .map((emp, index) => ({
+      name: emp.name,
+      date: `2024-${emp.birthday}`,
+      image: emp.image,
+      wishes: birthdayWishes[index % birthdayWishes.length]
+    }));
+}
+
 // Load projects on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadProjects();
   initializeDropdown();
   populateYearOptions();
+  
+  // Add month selection handler
+  document.getElementById('project-month').addEventListener('change', function() {
+    const month = this.value;
+    if (month) {
+      const birthdays = getBirthdaysByMonth(month);
+      sessionStorage.setItem('selectedMonthBirthdays', JSON.stringify(birthdays));
+      
+      // Show preview
+      const existing = document.getElementById('birthday-preview');
+      if (existing) existing.remove();
+      
+      if (birthdays.length > 0) {
+        const monthName = getMonthName(month);
+        const preview = document.createElement('div');
+        preview.id = 'birthday-preview';
+        preview.className = 'mt-4 p-4 bg-blue-600/20 border border-blue-500 rounded-lg';
+        preview.innerHTML = `
+          <h4 class="font-semibold text-blue-300 mb-2">Birthdays for ${monthName} (${birthdays.length})</h4>
+          <div class="text-sm text-blue-200">
+            ${birthdays.map(b => `• ${b.name}`).join('<br>')}
+          </div>
+        `;
+        this.parentNode.parentNode.appendChild(preview);
+      }
+    }
+  });
 });
 
 function populateYearOptions() {
@@ -361,16 +532,24 @@ document.getElementById('create-form').addEventListener('submit', async function
     const result = await response.json();
     
     if (result.success) {
-      // Set the newly created project as current
       localStorage.setItem('currentProject', result.project._id);
       localStorage.setItem('projectJustCreated', result.project._id);
       
-      hideCreateModal();
+      // Auto-populate birthdays
+      const storedBirthdays = sessionStorage.getItem('selectedMonthBirthdays');
+      if (storedBirthdays) {
+        const birthdays = JSON.parse(storedBirthdays);
+        if (birthdays.length > 0) {
+          // Create additional birthday entries if needed
+          const birthdayData = { birthdays, createAdditionalEntries: birthdays.length };
+          await api.saveData(birthdayData);
+          sessionStorage.removeItem('selectedMonthBirthdays');
+        }
+      }
       
-      // Reload projects to show the new one
+      hideCreateModal();
       await loadProjects();
       
-      // If Turbify template is selected, redirect to editor
       if (template === 'turbify') {
         setTimeout(() => {
           window.location.href = 'dept_forms.html';

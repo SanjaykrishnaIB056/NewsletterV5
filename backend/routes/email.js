@@ -23,10 +23,7 @@ function extractNameFromEmail(email) {
   return 'Team Member';
 }
 
-// Personalize HTML content with recipient name
-function personalizeHTML(html, recipientName) {
-  return html.replace(/Hello Team,/g, `Hello ${recipientName},`);
-}
+
 
 // Send newsletter email with CDN images
 router.post('/send', authMiddleware, async (req, res) => {
@@ -52,14 +49,11 @@ router.post('/send', authMiddleware, async (req, res) => {
     // Send personalized emails
     for (const email of emailList) {
       try {
-        const recipientName = extractNameFromEmail(email);
-        const personalizedHTML = personalizeHTML(html, recipientName);
-        
         const mailOptions = {
-          from: 'dharanigunasekar2003@gmail.com',
+          from: 'Team <dharanigunasekar2003@gmail.com>',
           to: email,
           subject: subject || 'Newsletter',
-          html: personalizedHTML
+          html: html
         };
         
         await transporter.sendMail(mailOptions);
@@ -114,14 +108,11 @@ router.post('/bulk-send', authMiddleware, async (req, res) => {
       
       await Promise.all(batch.map(async (email) => {
         try {
-          const recipientName = extractNameFromEmail(email);
-          const personalizedHTML = personalizeHTML(html, recipientName);
-          
           await transporter.sendMail({
-            from: 'dharanigunasekar2003@gmail.com',
+            from: 'Team <dharanigunasekar2003@gmail.com>',
             to: email,
             subject: subject || 'Newsletter',
-            html: personalizedHTML
+            html: html
           });
           
           successCount++;

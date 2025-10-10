@@ -3283,6 +3283,12 @@
     @media only screen and (min-width: 601px) {
       .main-table { width: 800px !important; max-width: 800px !important; table-layout: fixed !important; }
     }
+    /* Ensure all table cells respect the width constraint */
+    .main-table td {
+      max-width: 800px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
   </style>
 </head>
 <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color: #f9f9f9;">
@@ -3701,9 +3707,13 @@
             events
               ? `
           <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <h2 style="color: #0039A7; text-align: left;">📅 Upcoming Events</h2>
-              <div style="text-align: left;">${events}</div>
+            <td style="padding: 15px;">
+              <h3 style="font-size: 18px; color: #0039A7; text-align: left;">📅 Upcoming Events</h3>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 15px; border-bottom: 1px solid #ddd; max-width: 800px; word-wrap: break-word; overflow-wrap: break-word;">
+              ${events}
             </td>
           </tr>
           `
@@ -3714,9 +3724,13 @@
             notes
               ? `
           <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd; font-size: 14px;">
-              <h2 style="color: #0039A7; text-align: left;">📝 Notes</h2>
-              <div style="text-align: left;">${notes}</div>
+            <td style="padding: 15px;">
+              <h3 style="font-size: 18px; color: #0039A7; text-align: left;">📝 Notes</h3>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 15px; border-bottom: 1px solid #ddd; max-width: 800px; word-wrap: break-word; overflow-wrap: break-word;">
+              ${notes}
             </td>
           </tr>
           `
@@ -3724,8 +3738,8 @@
           }
 
           <tr>
-            <td style="background-color: #0039A7; color: white; padding: 10px 10px 5px 10px; text-align: center;">
-              <p>Let's keep the momentum going — here's to another successful month at Turbify! 🚀</p>
+            <td style="background-color: #0039A7; color: white; padding: 15px; text-align: center;">
+              <p style="margin: 0; font-size: 16px; line-height: 1.6;">Let's keep the momentum going — here's to another successful month at Turbify! 🚀</p>
             </td>
           </tr>
         </table>
@@ -4864,40 +4878,50 @@
         // Load birthdays with images
         console.log("Loading birthdays from database:", data.birthdays);
         if (data.birthdays && data.birthdays.length > 0) {
-          data.birthdays.forEach((birthday, index) => {
-            const birthdayEntries =
-              document.querySelectorAll(".birthday-entry");
-            console.log(
-              `Loading birthday ${index}:`,
-              birthday,
-              "into entry:",
-              birthdayEntries[index]
-            );
-            if (birthdayEntries[index]) {
-              const entry = birthdayEntries[index];
-              const nameInput = entry.querySelector(".birthday-name");
-              const dateInput = entry.querySelector(".birthday-date");
-              const wishesEditor = entry.querySelector(
-                ".birthday-wishes-editor"
+          // Create additional birthday entries if needed
+          const existingEntries = document.querySelectorAll(".birthday-entry").length;
+          const neededEntries = data.birthdays.length;
+          
+          for (let i = existingEntries; i < neededEntries; i++) {
+            addBirthday();
+          }
+          
+          // Wait for new entries to be created
+          setTimeout(() => {
+            data.birthdays.forEach((birthday, index) => {
+              const birthdayEntries = document.querySelectorAll(".birthday-entry");
+              console.log(
+                `Loading birthday ${index}:`,
+                birthday,
+                "into entry:",
+                birthdayEntries[index]
               );
-              const wishesEditorId = wishesEditor?.getAttribute("data-editor");
+              if (birthdayEntries[index]) {
+                const entry = birthdayEntries[index];
+                const nameInput = entry.querySelector(".birthday-name");
+                const dateInput = entry.querySelector(".birthday-date");
+                const wishesEditor = entry.querySelector(
+                  ".birthday-wishes-editor"
+                );
+                const wishesEditorId = wishesEditor?.getAttribute("data-editor");
 
-              if (nameInput) nameInput.value = birthday.name || "";
-              if (dateInput) dateInput.value = birthday.date || "";
-              if (birthday.image) {
-                entry.setAttribute("data-image", birthday.image);
-                const preview = entry.querySelector(".birthday-photo-preview");
-                const img = preview?.querySelector("img");
-                if (img && preview) {
-                  img.src = birthday.image;
-                  preview.classList.remove("hidden");
+                if (nameInput) nameInput.value = birthday.name || "";
+                if (dateInput) dateInput.value = birthday.date || "";
+                if (birthday.image) {
+                  entry.setAttribute("data-image", birthday.image);
+                  const preview = entry.querySelector(".birthday-photo-preview");
+                  const img = preview?.querySelector("img");
+                  if (img && preview) {
+                    img.src = birthday.image;
+                    preview.classList.remove("hidden");
+                  }
+                }
+                if (editors[wishesEditorId] && birthday.wishes) {
+                  editors[wishesEditorId].root.innerHTML = birthday.wishes;
                 }
               }
-              if (editors[wishesEditorId] && birthday.wishes) {
-                editors[wishesEditorId].root.innerHTML = birthday.wishes;
-              }
-            }
-          });
+            });
+          }, 500);
         }
 
         // Load section images
