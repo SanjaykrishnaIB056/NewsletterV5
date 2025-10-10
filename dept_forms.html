@@ -548,6 +548,28 @@
                 </div>
                 <div class="form-group">
                   <label class="block text-sm font-medium mb-2 text-neutral-300"
+                    >Newsletter Month:</label
+                  >
+                  <select
+                    id="newsletter-month"
+                    class="w-full p-3 border border-neutral-600 rounded-lg bg-neutral-700 text-white"
+                  >
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="block text-sm font-medium mb-2 text-neutral-300"
                     >Newsletter Title:</label
                   >
                   <input
@@ -3306,10 +3328,15 @@
           </tr>
           <tr>
             <td align="center" style="background-color: #0039A7; color: white; padding: 10px 10px 5px 10px; text-align: center;">
-              <h1 style="margin: 0; font-size: 28px;">Monthly Newsletter | ${new Date().toLocaleDateString(
-                "en-US",
-                { month: "long", year: "numeric" }
-              )}</h1>
+              <h1 style="margin: 0; font-size: 28px;">Monthly Newsletter | ${(() => {
+                const selectedMonth = document.getElementById('newsletter-month')?.value;
+                if (selectedMonth !== null && selectedMonth !== undefined) {
+                  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                  return monthNames[parseInt(selectedMonth)] + ' ' + new Date().getFullYear();
+                } else {
+                  return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+              })()}</h1>
             </td>
           </tr>
           ${
@@ -3587,10 +3614,15 @@
               ? `
           <tr>
             <td style="font-family: Arial, sans-serif; border-bottom: 1px solid #ddd; font-size: 14px; padding: 20px;">
-              <h2 style="text-align: center; color: #0039A7;">🎉 New Joiners & Birthdays – ${new Date().toLocaleDateString(
-                "en-US",
-                { month: "long", year: "numeric" }
-              )}</h2>
+              <h2 style="text-align: center; color: #0039A7;">🎉 New Joiners & Birthdays – ${(() => {
+                const selectedMonth = document.getElementById('newsletter-month')?.value;
+                if (selectedMonth !== null && selectedMonth !== undefined) {
+                  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                  return monthNames[parseInt(selectedMonth)] + ' ' + new Date().getFullYear();
+                } else {
+                  return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+              })()}</h2>
               ${
                 joiners.length > 0
                   ? `
@@ -3921,6 +3953,7 @@
           title:
             document.querySelector('input[name="newsletter_title"]')?.value ||
             "",
+          selectedMonth: document.getElementById('newsletter-month')?.value || new Date().getMonth().toString(),
           logo: {
             src: document.getElementById("current-logo")?.src || "",
             alt: document.getElementById("logo-alt")?.value || "",
@@ -4526,6 +4559,35 @@
         }
       }
 
+      // Initialize month selector
+      function initializeMonthSelector() {
+        const monthSelector = document.getElementById('newsletter-month');
+        if (monthSelector) {
+          // Set default to current month
+          const currentMonth = new Date().getMonth();
+          monthSelector.value = currentMonth.toString();
+          
+          // Add change event listener
+          monthSelector.addEventListener('change', function() {
+            updateLastUserAction();
+            // Update newsletter title display if needed
+            updateNewsletterTitleDisplay();
+          });
+        }
+      }
+      
+      // Update newsletter title display
+      function updateNewsletterTitleDisplay() {
+        const monthSelector = document.getElementById('newsletter-month');
+        const titleInput = document.querySelector('input[name="newsletter_title"]');
+        if (monthSelector && titleInput) {
+          const selectedMonth = parseInt(monthSelector.value);
+          const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          const year = new Date().getFullYear();
+          titleInput.value = `Monthly Newsletter | ${monthNames[selectedMonth]} ${year}`;
+        }
+      }
+
       // Initialize on page load
       document.addEventListener("DOMContentLoaded", async function () {
         // Check if we have a current project, if not redirect based on role
@@ -4630,6 +4692,10 @@
 
             // Setup color picker for activities
             setupActivitiesColorPicker();
+            
+            // Initialize month selector
+            initializeMonthSelector();
+            updateNewsletterTitleDisplay();
 
             // Add change tracking without auto-save
             Object.keys(editors).forEach((editorId) => {
@@ -4682,6 +4748,13 @@
         );
         if (titleInput && data.title) {
           titleInput.value = data.title;
+        }
+        
+        // Load selected month
+        const monthSelector = document.getElementById('newsletter-month');
+        if (monthSelector && data.selectedMonth !== undefined) {
+          monthSelector.value = data.selectedMonth;
+          updateNewsletterTitleDisplay();
         }
 
         // Load logo
