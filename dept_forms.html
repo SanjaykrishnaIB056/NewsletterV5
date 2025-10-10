@@ -3354,8 +3354,10 @@
                       }</h4>
                       <ul style="margin-left: 20px; font-size: 16px; line-height: 1.6;">
                         <li style="font-size: 16px; line-height: 1.6; text-align: left; margin-bottom: 4px;">${
-                          topic.content
-                        }${topic.link ? ` <a href="${topic.link}">here</a>` : ""}</li>
+                          topic.link ? 
+                            topic.content.replace(/<\/p>(\s*)$/, ` <a href="${topic.link}" style="display: inline;">here</a></p>$1`) :
+                            topic.content
+                        }</li>
                       </ul>
                     </td>
                   </tr>
@@ -3498,7 +3500,7 @@
                   </tr>
                   <tr>
                     <td style="padding: 20px; text-align: left;">
-                      <h3 style="text-align: center; margin: 0 0 20px 0;">Meet ${person.name}</h3>
+                      <h3 style="text-align: left; margin: 0 0 20px 0;">Meet ${person.name}</h3>
                         <p><strong style="color: #0039A7; font-size: 16px;">Role:</strong> ${
                           person.role
                         }</p>
@@ -3630,22 +3632,20 @@
                 birthdays.length > 0
                   ? `
               <h3 style="color: #0039A7; margin-top: 40px;">🎂 Happy Birthday To:</h3>
-              <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse;">
-                <tr>
+              <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse; table-layout: fixed; max-width: 800px;">
               ${(() => {
                 let birthdayHTML = "";
                 for (let i = 0; i < birthdays.length; i += 3) {
                   const rowBirthdays = birthdays.slice(i, i + 3);
                   birthdayHTML += `
-    <table width="100%" cellpadding="10" cellspacing="0" border="0" style="border-collapse: collapse;">
-      <tr>
+                <tr>
         ${rowBirthdays
           .map(
             (b) => `
-        <td valign="top" style="width: 33%; padding: 5px;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <td valign="top" style="width: 33.33%; padding: 5px; max-width: 266px; word-wrap: break-word; overflow-wrap: break-word;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout: fixed; max-width: 266px;">
             <tr>
-              <td style="width: 60px; vertical-align: top; padding-right: 10px;">
+              <td style="width: 60px; max-width: 60px; vertical-align: top; padding-right: 10px;">
                 ${
                   b.image
                     ? `
@@ -3655,21 +3655,21 @@
                   </v:roundrect>
                   <![endif]-->
                   <!--[if !mso]><!-- -->
-                  <img src="${b.image}" alt="${b.name}" width="50" height="50" style="border-radius: 50%; object-fit: cover; display: block;" />
+                  <img src="${b.image}" alt="${b.name}" width="50" height="50" style="border-radius: 50%; object-fit: cover; display: block; max-width: 50px;" />
                   <!--<![endif]-->
                 `
                     : ""
                 }
               </td>
-              <td style="vertical-align: top;">
-                <p style="margin: 0; font-size: 12px; line-height: 1.4;">
+              <td style="vertical-align: top; text-align: left; word-wrap: break-word; overflow-wrap: break-word;">
+                <p style="margin: 0; font-size: 12px; line-height: 1.4; text-align: left;">
                   <strong style="font-size: 13px;">${b.name}</strong> – ${b.date ? (() => {
                     const date = new Date(b.date);
                     const day = date.getDate();
                     const suffix = day % 10 === 1 && day !== 11 ? 'st' : day % 10 === 2 && day !== 12 ? 'nd' : day % 10 === 3 && day !== 13 ? 'rd' : 'th';
                     return day + suffix + ' ' + date.toLocaleDateString('en-GB', { month: 'long' });
                   })() : ''}<br>
-                  <em style="font-size: 11px;">${
+                  <em style="font-size: 11px; text-align: left;">${
                     b.wishes && b.wishes.trim() && b.wishes !== "<p><br></p>"
                       ? b.wishes.replace(/<[^>]*>/g, "")
                       : "Wishing you an amazing year ahead! 🎉"
@@ -3684,15 +3684,13 @@
           .join("")}
         ${
           rowBirthdays.length < 3
-            ? "<td></td>".repeat(3 - rowBirthdays.length)
+            ? "<td style=\"width: 33.33%;\"></td>".repeat(3 - rowBirthdays.length)
             : ""
         }
-      </tr>
-    </table>`;
+      </tr>`;
                 }
                 return birthdayHTML;
               })()}
-<tr/>
               </table>
               `
                   : ""
@@ -3707,13 +3705,15 @@
             events
               ? `
           <tr>
-            <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7; text-align: left;">📅 Upcoming Events</h3>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd; max-width: 800px; word-wrap: break-word; overflow-wrap: break-word;">
-              ${events}
+            <td style="padding: 15px 15px 5px 15px; border-bottom: 1px solid #ddd;">
+              <h3 style="font-size: 18px; color: #0039A7; text-align: left; margin: 0 0 8px 0;">📅 Upcoming Events</h3>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout: fixed; max-width: 800px;">
+                <tr>
+                  <td style="word-wrap: break-word; overflow-wrap: break-word; text-align: left;">
+                    ${events}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           `
@@ -3724,13 +3724,15 @@
             notes
               ? `
           <tr>
-            <td style="padding: 15px;">
-              <h3 style="font-size: 18px; color: #0039A7; text-align: left;">📝 Notes</h3>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 15px; border-bottom: 1px solid #ddd; max-width: 800px; word-wrap: break-word; overflow-wrap: break-word;">
-              ${notes}
+            <td style="padding: 15px 15px 5px 15px; border-bottom: 1px solid #ddd;">
+              <h3 style="font-size: 18px; color: #0039A7; text-align: left; margin: 0 0 8px 0;">📝 Notes</h3>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout: fixed; max-width: 800px;">
+                <tr>
+                  <td style="word-wrap: break-word; overflow-wrap: break-word; text-align: left;">
+                    ${notes}
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           `
